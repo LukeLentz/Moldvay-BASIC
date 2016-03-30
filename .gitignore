@@ -1,0 +1,8 @@
+*.cmi
+*.cmo
+interpreter/lexer.ml
+interpreter/parserml
+interpreter/parser.mli
+interpreter/lang
+compiled
+*.rk~
