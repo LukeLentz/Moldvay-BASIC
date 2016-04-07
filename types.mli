@@ -2,22 +2,21 @@ type exprC = IntC of int
                       | FloatC of float 
                       | BoolC of bool 
                       | IfC of (exprC * exprC * exprC) 
-                      | ArithC of (exprC * exprC * exprC) 
-                      | IfC of (exprC * exprC * exprC) 
-                      | CompC of (exprC * exprC * exprC) 
+                      | ArithC of (string * exprC * exprC) 
+                      | CompC of (string * exprC * exprC) 
                       | EqC of (exprC * exprC)
 
 type exprS = IntS of int 
-                      | FloatS of float | BoolS of bool 
+                      | FloatS of float 
+                      | BoolS of bool 
                       | IfS of (exprS * exprS * exprS) 
                       | OrS of (exprS * exprS) 
                       | AndS of (exprS * exprS) 
                       | XOrS of (exprS * exprS)
                       | NAndS of (exprS * exprS)
                       | NotS of (exprS) 
-                      | ArithS of (exprS   * exprS * exprS) 
-                      | IfS of (exprS * exprS * exprS) 
-                      | CompS of (exprS * exprS * exprS) 
+                      | ArithS of string * exprS * exprS
+                      | CompS of (string * exprS * exprS) 
                       | EqS of (exprS * exprS) 
                       | NeqS of (exprS * exprS)
 
