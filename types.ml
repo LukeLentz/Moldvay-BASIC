@@ -1,3 +1,6 @@
+exception Desugar of string
+exception Interp of string
+
 type exprC = IntC of int 
                       | FloatC of float 
                       | BoolC of bool 
@@ -47,9 +50,9 @@ let rec desugar exprS = match exprS with
   | FloatS f    -> FloatC f
   | BoolS b       -> BoolC b
   | IfS (a, b, c) -> IfC (desugar a, desugar b, desugar c)
-  | AndS (a, b)   -> desugar (IfS (a, IfS (b, BoolS true, BoolS false), BoolS false))
-  | NAndS (x, y) -> desugar (IfS (x, IfS (y, BoolS false, BoolS true), BoolS true))
-  | OrS (a, b)  -> desugar (IfS (a, BoolS true, (IfS (b, BoolS true, BoolS false))))
+  | AndS (x, y)   -> desugar (IfS (x, IfS (y, BoolS true, BoolS false), BoolS false))
+  | NAndS (x, y) -> desugar (NotS (AndS (x, y)))
+  | OrS (x, y)  -> desugar (IfS (x, BoolS true, (IfS (y, BoolS true, BoolS false))))
   | XOrS (x, y) -> desugar (IfS (x, IfS (y, BoolS false, BoolS true), IfS (y, BoolS true, BoolS false)))
   | NotS a       -> desugar (IfS (a, BoolS false, BoolS true))
   | ArithS (op, x, y)  -> ArithC (op, desugar x, desugar y)
@@ -63,8 +66,8 @@ let rec desugar exprS = match exprS with
     | ("-", Int v1, Int v2) -> Int (v1 - v2)
     | ("*", Int v1, Int v2) -> Int (v1 * v2)
     | ("/", Int v1, Int v2) -> if (v2 = 0)
-                                                then raise (Failure "Interp")
-                                                else Int (v1 / v2)
+                                        then raise (Failure "Interp")
+                                        else Int (v1 / v2)
     | ("+.", Float v1, Float v2) -> Float (v1 +. v2)
     | ("-.", Float v1, Float v2) -> Float (v1 -. v2)
     | ("*.", Float v1, Float v2) -> Float (v1 *. v2)
@@ -113,7 +116,7 @@ let rec interp env r = match r with
                                       | _ -> raise (Failure "Interp"))
   | EqC (x, y) -> eqEval (interp [] x) (interp [] y)
   | IfC (test, op1, op2 ) -> 
-     (match (interp env test) with 
+     (match (interp [] test) with 
      | Bool true -> interp [] op1
      | Bool false -> interp [] op2
      | _ -> raise (Failure "Not a Bool")) 

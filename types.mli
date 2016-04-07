@@ -1,3 +1,6 @@
+exception Desugar of string
+exception Interp of string
+
 type exprC = IntC of int 
                       | FloatC of float 
                       | BoolC of bool 
