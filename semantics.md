@@ -1,6 +1,14 @@
 () denotes optional arguments
 * denotes indefinite amount
 
+// for in-line comments
+
+/* 
+this is used
+for mulit-line
+comments
+*/
+
 xor : bool -> bool -> bool
     returns true if only one of the given expressions is true, otherwise returns false
 
