@@ -12,6 +12,7 @@ let exp = ['e' 'E'] sign? digit+
 let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
 let dblsemi = ";;"
+let int = (digit)+
 let float = (digit+ '.'? | digit* frac) exp?
 let true = "true" | "#t"
 let false = "false" | "#f"
@@ -22,6 +23,7 @@ rule token = parse
   | newline     { token lexbuf }
   | dblsemi     { DBLSEMI }
   | float as x  { FLOAT (float_of_string x) }
+  | int as x    { INT (int_of_string x) }
   | true        { TRUE }
   | false       { FALSE }
   | "if" 		{ IF }

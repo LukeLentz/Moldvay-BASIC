@@ -11,7 +11,7 @@
 %token PLUS MINUS TIMES DIVIDE
 %token <string> COMPOP 
 %token EQ NEQ
-%nonassoc FLOAT
+
 %nonassoc ELSE
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
@@ -20,7 +20,7 @@
 %left PLUS MINUS
 %left TIMES DIVIDE 
 %token DBLSEMI
-
+%nonassoc FLOAT INT
 
 %start main
 %type <Types.exprS> main

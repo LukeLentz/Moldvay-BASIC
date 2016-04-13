@@ -103,22 +103,22 @@ let rec interp env r = match r with
   | ArithC (op, x, y) -> (match (x, y) with
                                     | (IntC v, IntC n) -> arithEval op (Int v) (Int n)
                                     | (FloatC v, FloatC n) -> arithEval op (Float v) (Float n)
-                                    | (IntC v, ArithC n) -> arithEval op (Int v) (interp [] (ArithC n))
-                                    | (FloatC v, ArithC n) -> arithEval op (Float v) (interp [] (ArithC n)) 
+                                    | (IntC v, ArithC n) -> arithEval op (Int v) (interp env (ArithC n))
+                                    | (FloatC v, ArithC n) -> arithEval op (Float v) (interp env (ArithC n)) 
 
-                                    | (ArithC v, IntC n) -> arithEval op (interp [] (ArithC v)) (Int n)
-                                    | (ArithC v, FloatC n) -> arithEval op (interp [] (ArithC v)) (Float n)
-                                    | (ArithC v, ArithC n) -> arithEval op (interp [] (ArithC v)) (interp [] (ArithC n))
+                                    | (ArithC v, IntC n) -> arithEval op (interp env (ArithC v)) (Int n)
+                                    | (ArithC v, FloatC n) -> arithEval op (interp env (ArithC v)) (Float n)
+                                    | (ArithC v, ArithC n) -> arithEval op (interp env (ArithC v)) (interp env (ArithC n))
                                     | _ -> raise (Failure "Interp") )
   | CompC (op, x, y) -> (match (x, y) with
                                       | (IntC x, IntC y) -> compEval op (Int x) (Int y)
                                       | (FloatC x, FloatC y) -> compEval op (Float x) (Float y)
                                       | _ -> raise (Failure "Interp"))
-  | EqC (x, y) -> eqEval (interp [] x) (interp [] y)
+  | EqC (x, y) -> eqEval (interp env x) (interp env y)
   | IfC (test, op1, op2 ) -> 
-     (match (interp [] test) with 
-     | Bool true -> interp [] op1
-     | Bool false -> interp [] op2
+     (match (interp env test) with 
+     | Bool true -> interp env op1
+     | Bool false -> interp env op2
      | _ -> raise (Failure "Not a Bool")) 
 
 
