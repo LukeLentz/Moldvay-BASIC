@@ -24,3 +24,27 @@ let t2k = evaluate (desugar (AndS (BoolS true, BoolS true))) = Bool true
 let t2l = evaluate (desugar (XOrS (BoolS true, BoolS false))) = Bool true
 let t2l = evaluate (desugar (XOrS (BoolS true, BoolS true))) = Bool false
 let t2m = evaluate (desugar (NAndS (BoolS true, BoolS true))) = Bool false
+
+let t3a = evaluate (ArithC ("+", IntC 1, IntC 1)) = Int 2
+let t3b = evaluate (ArithC ("-." , FloatC 2.5 , FloatC 1.)) = Float 1.5
+let t3c = evaluate (ArithC ("*." , FloatC 5. , FloatC 5.)) = Float 25.
+let t3d = evaluate (ArithC ("/" , IntC 10 , IntC 5)) = Int 2
+let t3e = desugar (ArithS ("+", IntS 1, IntS 1)) = ArithC("+", IntC 1, IntC 1)
+
+let t4a = evaluate (CompC (">", IntC 20, IntC 1)) = Bool true 
+let t4b = evaluate (CompC (">", FloatC 1., FloatC 20.)) = Bool false
+let t4c = evaluate (CompC (">=", FloatC 20., FloatC 20.)) = Bool true 
+let t4d = evaluate (CompC (">=", IntC 0, IntC 1)) = Bool false 
+let t4e = evaluate (CompC ("<", IntC 1, IntC 1)) = Bool false 
+let t4f = evaluate (CompC ("<", FloatC 0., FloatC 1.)) = Bool true 
+let t4g = evaluate (CompC ("<=", FloatC 20., FloatC 100.)) = Bool true 
+let t4h = evaluate (CompC ("<=", IntC 20, IntC 1)) = Bool false
+let t4i = desugar (CompS (">", FloatS 1., FloatS 1.)) = CompC(">", FloatC 1., FloatC 1.)
+
+let t5a = evaluate (EqC (IntC 20, IntC 20)) = Bool true 
+let t5b = evaluate (EqC (FloatC 220., FloatC 20.)) = Bool false
+let t5c = evaluate (EqC (BoolC false, BoolC false)) = Bool true 
+let t5d = evaluate (EqC (BoolC true, BoolC true)) = Bool true
+let t5e = evaluate (EqC (FloatC 20., BoolC true)) = Bool false
+let t5f = desugar  (EqS (FloatS 20., BoolS true)) = EqC (FloatC 20., BoolC true)
+let t5g = desugar  (NeqS (FloatS 20., BoolS true)) =  IfC (EqC (FloatC 20., BoolC true), BoolC false, BoolC true) 
