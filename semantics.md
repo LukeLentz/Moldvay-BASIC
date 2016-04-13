@@ -27,3 +27,22 @@ if e1 then e2 else e3
 def string e1 (e2)*
 	binds e1 to the string, equivalent to let statement
 	(e2)* are additional expressions equivalent to let in
+
+Addition:
+    arith + int int
+    arith +. float float
+
+Subtraction:
+    arith - int int
+    arith -. float float
+
+Multiplication:
+    arith * int int
+    arith *. float float
+
+Division:
+    arith / int int
+    ariht /. float float
+        throw exception if division by 0
+
+
