@@ -8,7 +8,7 @@
 %token DBLSEMI
 %token IF THEN ELSE
 %token OR AND NOT XOR NAND
-%token PLUS MINUS TIMES DIVIDE
+%token PLUS MINUS TIMES DIVIDE PLUSF MINUSF TIMESF DIVIDEF
 %token <string> COMPOP 
 %token EQ NEQ
 
@@ -17,8 +17,8 @@
 %nonassoc EQ NEQ
 %nonassoc NOT
 %nonassoc COMPOP
-%left PLUS MINUS
-%left TIMES DIVIDE 
+%left PLUS MINUS PLUSF MINUSF
+%left TIMES DIVIDE TIMESF DIVIDEF
 %token DBLSEMI
 %nonassoc FLOAT INT
 
@@ -46,9 +46,13 @@ expr:
   | expr XOR expr                { XOrS($1,$3)}
   | expr NAND expr               { NAndS($1,$3)}
   | expr PLUS expr 				       { ArithS("+",$1,$3)}
+  | expr PLUSF expr              { ArithS("+.",$1,$3)}
   | expr MINUS expr 			       { ArithS("-",$1,$3)}
+  | expr MINUSF expr             { ArithS("-.",$1,$3)}
   | expr TIMES expr 		         { ArithS("*",$1,$3)}
+  | expr TIMESF expr              { ArithS("*.",$1,$3)}
   | expr DIVIDE expr 		 	       { ArithS("/",$1,$3)}
+  | expr DIVIDEF expr             { ArithS("/.",$1,$3)}
   | expr COMPOP expr 			       { CompS ($2, $1, $3) }
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }

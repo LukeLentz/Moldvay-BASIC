@@ -12,8 +12,8 @@ let exp = ['e' 'E'] sign? digit+
 let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
 let dblsemi = ";;"
+let float = (digit+ '.' | digit* frac) exp?
 let int = (digit)+
-let float = (digit+ '.'? | digit* frac) exp?
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
@@ -38,6 +38,10 @@ rule token = parse
   | "-"			{ MINUS }
   | "*" 		{ TIMES }
   | "/" 		{ DIVIDE }
+  | "+."     { PLUSF }
+  | "-."     { MINUSF }
+  | "*."     { TIMESF }
+  | "/."     { DIVIDEF }
   | "==" 		{ EQ }
   | "!="        { NEQ }
   | comp as s   { COMPOP s }
