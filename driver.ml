@@ -25,5 +25,8 @@ let _ =
                                        Lexing.flush_input lexbuf
         | Interp s                  -> output_string stdout ("Interpret error: " ^ s);
                                        print_newline();
-                                       Lexing.flush_input lexbuf                            
+                                       Lexing.flush_input lexbuf      
+        | Typecheck s                  -> output_string stdout ("Typecheck error: " ^ s);
+                                       print_newline();
+                                       Lexing.flush_input lexbuf                         
     done
