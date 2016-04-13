@@ -1,5 +1,6 @@
 exception Desugar of string
 exception Interp of string
+exception Typecheck of string
 
 type exprC = IntC of int 
                       | FloatC of float 

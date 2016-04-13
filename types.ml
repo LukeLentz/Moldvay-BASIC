@@ -1,5 +1,6 @@
 exception Desugar of string
 exception Interp of string
+exception Typecheck of string
 
 type exprC = IntC of int 
                       | FloatC of float 
@@ -133,3 +134,7 @@ let rec valToString r = match r with
   | Float i           -> string_of_float i
   | Int i           -> string_of_int i
   | Bool b          -> string_of_bool b
+
+let rec tc env e =
+    match e with
+    | 
