@@ -45,4 +45,10 @@ Division:
     ariht /. float float
         throw exception if division by 0
 
+Tuples:
+    to access part of a tuple
+        t.0 (1, 2, 3) returns 1
+        t.1 returns 2, etc
+        
+
 
