@@ -39,7 +39,8 @@ val bind :  string -> 'a -> 'a env -> 'a env
 (* Interpreter steps *)
 val desugar : exprS -> exprC
 val interp : value env -> exprC -> value
-val evaluate : exprC -> value
+val evaluate : exprC -> types * value
 
 (* result post-processing *)
 val valToString : value -> string
+val pairToString : types * value -> string

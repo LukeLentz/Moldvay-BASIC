@@ -126,11 +126,21 @@ let rec interp env r = match r with
      | Bool false -> interp env op2
      | _ -> raise (Failure "Not a Bool")) 
 
+let rec tc env e =
+    match e with
+    |IntC i -> IntT
+    |FloatC c -> FloatT
+    |BoolC b -> BoolT
+    (*Need ArithC, IfC, CompC, EqC *)
+    | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
-let evaluate exprC = exprC |> interp []
-
-
+(*let evaluate exprC = exprC |> interp []*)
+let evaluate exprC = 
+  let ts = tc [] exprC 
+    in let vs = interp [] exprC
+      in (ts,vs)
+  (*return pair of type and result*)
 
 
 (* You will need to add cases to this function as you add new value types. *)
@@ -139,9 +149,11 @@ let rec valToString r = match r with
   | Int i           -> string_of_int i
   | Bool b          -> string_of_bool b
 
-let rec tc env e =
-    match e with
-    |IntC i = IntT
-    |FloatC c = FloatT
-    |BoolC b = BoolT
-    | _ -> raise (Failure "Typecheck")
+
+let typeToString t = 
+    match t with
+    | IntT -> "IntT "
+    | FloatT -> "FloatT "
+    | BoolT -> "BoolT "
+
+let pairToString (t,r) =  (typeToString t) ^ (valToString r)
