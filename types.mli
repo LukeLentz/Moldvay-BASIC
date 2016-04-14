@@ -3,32 +3,37 @@ exception Interp of string
 exception Typecheck of string
 
 type exprC = IntC of int 
-                      | FloatC of float 
-                      | BoolC of bool 
-                      | IfC of (exprC * exprC * exprC) 
-                      | ArithC of (string * exprC * exprC) 
-                      | CompC of (string * exprC * exprC) 
-                      | EqC of (exprC * exprC)
+                  | FloatC of float 
+                  | BoolC of bool 
+                  | IfC of (exprC * exprC * exprC) 
+                  | ArithC of (string * exprC * exprC) 
+                  | CompC of (string * exprC * exprC) 
+                  | EqC of (exprC * exprC)
+                  | TupleC of (exprC list)
 
 type exprS = IntS of int 
-                      | FloatS of float 
-                      | BoolS of bool 
-                      | IfS of (exprS * exprS * exprS) 
-                      | OrS of (exprS * exprS) 
-                      | AndS of (exprS * exprS) 
-                      | XOrS of (exprS * exprS)
-                      | NAndS of (exprS * exprS)
-                      | NotS of (exprS) 
-                      | ArithS of string * exprS * exprS
-                      | CompS of (string * exprS * exprS) 
-                      | EqS of (exprS * exprS) 
-                      | NeqS of (exprS * exprS)
+                  | FloatS of float 
+                  | BoolS of bool 
+                  | IfS of (exprS * exprS * exprS) 
+                  | OrS of (exprS * exprS) 
+                  | AndS of (exprS * exprS) 
+                  | XOrS of (exprS * exprS)
+                  | NAndS of (exprS * exprS)
+                  | NotS of (exprS) 
+                  | ArithS of string * exprS * exprS
+                  | CompS of (string * exprS * exprS) 
+                  | EqS of (exprS * exprS) 
+                  | NeqS of (exprS * exprS)
+                  | TupleS of (exprS list)
 
-type value = Int of int | Float of float | Bool of bool
+type value = Int of int 
+                  | Float of float
+                  | Bool of bool
 
 type types = IntT
-            | FloatT
-            | BoolT
+                  | FloatT
+                  | BoolT
+                  | TupleT
 
 (* Environment lookup *)
 type 'a env
