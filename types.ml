@@ -29,6 +29,7 @@ type exprS = IntS of int
 type value = Int of int 
                   | Float of float
                   | Bool of bool
+                  | Tuple of (value * value)
 
 type types = IntT
                   | FloatT
@@ -131,7 +132,7 @@ let rec interp env r = match r with
      | Bool true -> interp env op1
      | Bool false -> interp env op2
      | _ -> raise (Failure "Not a Bool"))
-  | TupleC (x, y) -> TupleC (interp env x, interp env y)
+  | TupleC (x, y) -> Tuple (interp env x, interp env y)
 
 let rec tc env e =
     match e with
@@ -156,6 +157,7 @@ let rec valToString r = match r with
   | Float i           -> string_of_float i
   | Int i           -> string_of_int i
   | Bool b          -> string_of_bool b
+  | Tuple (t1,t2) -> (valToString t1) ^ (valToString t2)
 
 
 let typeToString t = 
@@ -163,7 +165,7 @@ let typeToString t =
     | IntT -> "IntT "
     | FloatT -> "FloatT "
     | BoolT -> "BoolT "
-    | TupleT (x, y) -> (typeToString (tc x) * typeToString (tc y))
+    | TupleT -> "TupleT"
 
 let pairToString (t,r) = 
     (typeToString t) ^ (valToString r)

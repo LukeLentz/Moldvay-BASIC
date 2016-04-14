@@ -29,6 +29,7 @@ type exprS = IntS of int
 type value = Int of int 
                   | Float of float
                   | Bool of bool
+                  | Tuple of (value * value)
 
 type types = IntT
                   | FloatT
