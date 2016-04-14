@@ -9,7 +9,7 @@ type exprC = IntC of int
                   | ArithC of (string * exprC * exprC) 
                   | CompC of (string * exprC * exprC) 
                   | EqC of (exprC * exprC)
-                  | TupleC of (exprC list)
+                  | TupleC of (exprC * exprC)
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -24,7 +24,7 @@ type exprS = IntS of int
                   | CompS of (string * exprS * exprS) 
                   | EqS of (exprS * exprS) 
                   | NeqS of (exprS * exprS)
-                  | TupleS of (exprS list)
+                  | TupleS of (exprS * exprS)
 
 type value = Int of int 
                   | Float of float
@@ -69,6 +69,7 @@ let rec desugar exprS = match exprS with
   | CompS (op, x, y) -> CompC (op, desugar x, desugar y)
   | EqS (x, y) -> EqC (desugar x, desugar y)
   | NeqS (x, y) -> desugar (NotS (EqS (x, y)))
+  | TupleS (x, y) -> TupleC (desugar x, desugar y)
 
   let arithEval op v1 v2 =
     match (op, v1, v2) with
@@ -129,7 +130,8 @@ let rec interp env r = match r with
      (match (interp env test) with 
      | Bool true -> interp env op1
      | Bool false -> interp env op2
-     | _ -> raise (Failure "Not a Bool")) 
+     | _ -> raise (Failure "Not a Bool"))
+  | TupleC (x, y) -> TupleC (interp env x, interp env y)
 
 let rec tc env e =
     match e with
@@ -137,6 +139,7 @@ let rec tc env e =
     |FloatC c -> FloatT
     |BoolC b -> BoolT
     (*Need ArithC, IfC, CompC, EqC *)
+    | TupleC t -> TupleT
     | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
@@ -160,6 +163,7 @@ let typeToString t =
     | IntT -> "IntT "
     | FloatT -> "FloatT "
     | BoolT -> "BoolT "
+    | TupleT (x, y) -> (typeToString (tc x) * typeToString (tc y))
 
 let pairToString (t,r) = 
     (typeToString t) ^ (valToString r)
