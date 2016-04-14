@@ -26,6 +26,10 @@ type exprS = IntS of int
 
 type value = Int of int | Float of float | Bool of bool
 
+type types = IntT
+            | FloatT
+            | BoolT
+
 (* Environment lookup *)
 type 'a env
 val empty : 'a env

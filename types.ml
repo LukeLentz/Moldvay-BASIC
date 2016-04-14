@@ -26,6 +26,10 @@ type exprS = IntS of int
 
 type value = Int of int | Float of float | Bool of bool
 
+type types = IntT
+           | FloatT
+           | BoolT
+
 type 'a env = (string * 'a) list
 
 let empty = []
@@ -137,4 +141,7 @@ let rec valToString r = match r with
 
 let rec tc env e =
     match e with
-    | 
+    |IntC i = IntT
+    |FloatC c = FloatT
+    |BoolC b = BoolT
+    | _ -> raise (Failure "Typecheck")
