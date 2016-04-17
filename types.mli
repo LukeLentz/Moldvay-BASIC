@@ -9,7 +9,7 @@ type exprC = IntC of int
                   | ArithC of (string * exprC * exprC) 
                   | CompC of (string * exprC * exprC) 
                   | EqC of (exprC * exprC)
-                  | TupleC of (exprC * exprC)
+                  | TupleC of exprC list
                   | ListC of exprC list
 
 type exprS = IntS of int 
@@ -25,18 +25,19 @@ type exprS = IntS of int
                   | CompS of (string * exprS * exprS) 
                   | EqS of (exprS * exprS) 
                   | NeqS of (exprS * exprS)
-                  | TupleS of (exprS * exprS)
+                  | TupleS of exprS list
                   | ListS of exprS list
 
 type value = Int of int 
                   | Float of float
                   | Bool of bool
-                  | Tuple of (value * value)
+                  | Tuple of value list
 
 type types = IntT
                   | FloatT
                   | BoolT
-                  | TupleT
+                  | TupleT of types list
+
 
 (* Environment lookup *)
 type 'a env

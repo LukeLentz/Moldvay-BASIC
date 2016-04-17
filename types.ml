@@ -9,7 +9,7 @@ type exprC = IntC of int
                   | ArithC of (string * exprC * exprC) 
                   | CompC of (string * exprC * exprC) 
                   | EqC of (exprC * exprC)
-                  | TupleC of (exprC * exprC)
+                  | TupleC of exprC list
                   | ListC of exprC list
 
 type exprS = IntS of int 
@@ -25,18 +25,20 @@ type exprS = IntS of int
                   | CompS of (string * exprS * exprS) 
                   | EqS of (exprS * exprS) 
                   | NeqS of (exprS * exprS)
-                  | TupleS of (exprS * exprS)
+                  | TupleS of exprS list
                   | ListS of exprS list
 
 type value = Int of int 
                   | Float of float
                   | Bool of bool
-                  | Tuple of (value * value)
+                  | Tuple of value list
+                
 
 type types = IntT
                   | FloatT
                   | BoolT
-                  | TupleT
+                  | TupleT of types list
+
 
 type 'a env = (string * 'a) list
 
@@ -72,7 +74,12 @@ let rec desugar exprS = match exprS with
   | CompS (op, x, y) -> CompC (op, desugar x, desugar y)
   | EqS (x, y) -> EqC (desugar x, desugar y)
   | NeqS (x, y) -> desugar (NotS (EqS (x, y)))
-  | TupleS (x, y) -> TupleC (desugar x, desugar y)
+  | TupleS lst -> TupleC (List.map (desugar) lst)
+
+
+  
+
+
 
   let arithEval op v1 v2 =
     match (op, v1, v2) with
@@ -134,7 +141,7 @@ let rec interp env r = match r with
      | Bool true -> interp env op1
      | Bool false -> interp env op2
      | _ -> raise (Failure "Not a Bool"))
-  | TupleC (x, y) -> Tuple (interp env x, interp env y)
+     | TupleC lst -> Tuple (List.map (interp env) lst)
 
 let rec tc env e =
     match e with
@@ -142,7 +149,7 @@ let rec tc env e =
     |FloatC c -> FloatT
     |BoolC b -> BoolT
     (*Need ArithC, IfC, CompC, EqC *)
-    | TupleC t -> TupleT
+    |TupleC lst -> TupleT (List.map (tc env) lst)
     | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
@@ -159,15 +166,15 @@ let rec valToString r = match r with
   | Float i           -> string_of_float i
   | Int i           -> string_of_int i
   | Bool b          -> string_of_bool b
-  | Tuple (t1,t2) -> (valToString t1) ^ (valToString t2)
+  | Tuple lst ->  (String.concat " * " ((List.map (valToString) lst)))
 
 
-let typeToString t = 
+let rec typeToString t = 
     match t with
     | IntT -> "IntT "
     | FloatT -> "FloatT "
     | BoolT -> "BoolT "
-    | TupleT -> "TupleT"
+    | TupleT lst -> "TupleT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
 
 let pairToString (t,r) = 
     (typeToString t) ^ (valToString r)
