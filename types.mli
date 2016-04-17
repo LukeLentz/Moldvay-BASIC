@@ -32,11 +32,14 @@ type value = Int of int
                   | Float of float
                   | Bool of bool
                   | Tuple of value list
+                  | List of value list
 
 type types = IntT
                   | FloatT
                   | BoolT
                   | TupleT of types list
+                  | ListT of types list
+                  | AnyT
 
 
 (* Environment lookup *)

@@ -39,6 +39,7 @@ type types = IntT
                   | BoolT
                   | TupleT of types list
                   | ListT of types list
+                  | AnyT
 
 
 type 'a env = (string * 'a) list
@@ -154,8 +155,9 @@ let rec tc env e =
     (*Need ArithC, IfC, CompC, EqC *)
     |TupleC lst -> TupleT (List.map (tc env) lst)
     | ListC lst -> (match lst with
-                          | (x :: xs :: rest) -> (if (tc env x) == (tc env xs)) then ListT (x :: xs :: (List.map (tc env) rest)) else raise (Failure "Typecheck")
+                          | [] -> AnyT
                           | (x :: []) -> ListT (tc env x) :: [])
+                          | (x :: xs) -> (if List.for_all (tc env x)) then ListT (List.map (tc env) lst) else raise (Failure "Typecheck")
     | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
