@@ -10,6 +10,7 @@ type exprC = IntC of int
                   | CompC of (string * exprC * exprC) 
                   | EqC of (exprC * exprC)
                   | TupleC of (exprC * exprC)
+                  | ListC of exprC list
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -25,6 +26,7 @@ type exprS = IntS of int
                   | EqS of (exprS * exprS) 
                   | NeqS of (exprS * exprS)
                   | TupleS of (exprS * exprS)
+                  | ListS of exprS list
 
 type value = Int of int 
                   | Float of float
