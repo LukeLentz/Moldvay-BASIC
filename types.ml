@@ -149,17 +149,32 @@ let rec interp env r = match r with
 
 let rec tc env e =
     match e with
-    |IntC i -> IntT
-    |FloatC c -> FloatT
-    |BoolC b -> BoolT
-    (*Need ArithC, IfC, CompC, EqC *)
+    | IntC i -> IntT
+    | FloatC c -> FloatT
+    | BoolC b -> BoolT
     | ArithC (op, IntC x, IntC y) -> (match op with
                                                     | "+" | "-" | "*" | "/" -> IntT
                                                     | _ -> raise (Failure "Typecheck"))
     | ArithC (op, FloatC x, FloatC y) -> (match op with
                                                             | "+." | "-." | "*." | "/." -> FloatT
                                                             | _ -> raise (Failure "Typecheck"))
-    |TupleC lst -> TupleT (List.map (tc env) lst)
+    | IfC (test, thn, els) -> (match (tc env test) with
+                                          | BoolT -> if ((tc env thn) = (tc env els))
+                                                           then (tc env thn) (* thn and els are the same type so either is fine *)
+                                                           else raise (Failure "Typecheck")
+                                          | _ -> raise (Failure "Typecheck"))
+    | CompC (op, IntC x, IntC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, FloatC x, FloatC y) -> (match op with
+                                                              | ">" | "<" | "<=" | ">=" -> BoolT
+                                                              | _ -> raise (Failure "Typecheck"))
+    | EqC (x, y) -> (match (x, y) with
+                              | (IntC x, IntC y) -> BoolT
+                              | (FloatC x, FloatC y) -> BoolT
+                              | (BoolC x, BoolC y) -> BoolT
+                              | _ -> raise (Failure "Typecheck"))
+    | TupleC lst -> TupleT (List.map (tc env) lst)
     | ListC lst -> (match lst with
                           | [] -> AnyT
                           | (x :: []) -> ListT ((tc env x) :: [])
