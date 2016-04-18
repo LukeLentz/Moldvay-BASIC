@@ -153,11 +153,19 @@ let rec tc env e =
     |FloatC c -> FloatT
     |BoolC b -> BoolT
     (*Need ArithC, IfC, CompC, EqC *)
+    | ArithC (op, IntC x, IntC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, FloatC x, FloatC y) -> (match op with
+                                                            | "+." | "-." | "*." | "/." -> FloatT
+                                                            | _ -> raise (Failure "Typecheck"))
     |TupleC lst -> TupleT (List.map (tc env) lst)
     | ListC lst -> (match lst with
                           | [] -> AnyT
-                          | (x :: []) -> ListT (tc env x) :: [])
-                          | (x :: xs) -> (if List.for_all (tc env x)) then ListT (List.map (tc env) lst) else raise (Failure "Typecheck")
+                          | (x :: []) -> ListT ((tc env x) :: [])
+                          | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
+                                               then ListT (List.map (tc env) lst)
+                                               else raise (Failure "Typecheck")))
     | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
@@ -185,6 +193,7 @@ let rec typeToString t =
     | BoolT -> "BoolT "
     | TupleT lst -> "TupleT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
     | ListT lst -> "ListT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
+    | AnyT -> "AnyT "
 
 let pairToString (t,r) = 
     (typeToString t) ^ (valToString r)
