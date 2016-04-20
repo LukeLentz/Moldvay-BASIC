@@ -55,8 +55,8 @@ let empty = []
 (* lookup : string -> 'a env -> 'a option *)
 (* changed from option type to fix var parsing *)
 let rec lookup str env = match env with
-  | []          -> raise (Failure "Lookup")
-  | (s,v) :: tl -> if s = str then v else lookup str tl
+  | []          -> None
+  | (s,v) :: tl -> if s = str then Some v else lookup str tl
 (* val bind :  string -> 'a -> 'a env -> 'a env *)
 let bind str v env = (str, v) :: env
 
@@ -155,8 +155,12 @@ let rec interp env r = match r with
                                      | _ -> raise (Failure "Not a Bool"))
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
-  | VarC v -> interp env (lookup v env)
-  | LetC (v, e) -> Env (bind v e env)
+  | VarC v -> match (lookup v env) with
+              |Some v -> interp env v
+              |None -> raise(Failure "lookup")
+  | LetC (v, e) -> match (bind v e env) with
+                   |Some v -> Env 
+                   |None -> raise(Failure "bind")
 
 let rec tc env e =
     match e with

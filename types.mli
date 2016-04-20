@@ -50,7 +50,7 @@ type types = IntT
 (* Environment lookup *)
 type 'a env
 val empty : 'a env
-val lookup : 'a -> ('a * 'b) list -> 'b
+val lookup : string -> 'a env -> 'a option
 val bind :  string -> 'a -> 'a env -> 'a env
 
 (* Interpreter steps *)
