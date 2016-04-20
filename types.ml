@@ -37,6 +37,7 @@ type value = Int of int
                   | Bool of bool
                   | Tuple of value list
                   | List of value list
+                  | Env of (string * exprC) list
 
 
 type types = IntT
@@ -155,7 +156,7 @@ let rec interp env r = match r with
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
   | VarC v -> interp env (lookup v env)
-  | LetC (v, e) -> bind v e env
+  | LetC (v, e) -> Env (bind v e env)
 
 let rec tc env e =
     match e with
@@ -209,6 +210,7 @@ let rec valToString r = match r with
   | Bool b          -> string_of_bool b
   | Tuple lst ->  (String.concat " * " ((List.map (valToString) lst)))
   | List lst -> (String.concat " * " ((List.map (valToString) lst)))
+(*   | Env e -> (String.concat " * " ((List.map (valToString) e))) *)
 
 
 let rec typeToString t = 

@@ -37,6 +37,7 @@ type value = Int of int
                   | Bool of bool
                   | Tuple of value list
                   | List of value list
+                  | Env of (string * exprC) list
 
 type types = IntT
                   | FloatT
@@ -49,12 +50,12 @@ type types = IntT
 (* Environment lookup *)
 type 'a env
 val empty : 'a env
-val lookup : string -> 'a env -> 'a option
+val lookup : 'a -> ('a * 'b) list -> 'b
 val bind :  string -> 'a -> 'a env -> 'a env
 
 (* Interpreter steps *)
 val desugar : exprS -> exprC
-val interp : value env -> exprC -> value
+val interp : (string * exprC) list -> exprC -> value
 val evaluate : exprC -> types * value
 
 (* result post-processing *)
