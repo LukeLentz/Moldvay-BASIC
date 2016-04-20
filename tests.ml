@@ -9,7 +9,7 @@ let t1a = evaluate (BoolC true) = (BoolT, Bool true)
 let t1b = evaluate (BoolC false) = (BoolT, Bool false)
 let t1c = desugar (BoolS true) = (BoolC true)
 let t1d = desugar (BoolS false) = (BoolC false)
-(*)
+
 let t2a = evaluate (IfC (BoolC true, FloatC 2.3, FloatC 4.3)) = (FloatT, Float 2.3)
 let t2b = evaluate (IfC (IfC (BoolC false, BoolC false, BoolC true), IntC 2, IntC 4)) = (IntT, Int 2)
 let t2c = desugar (IfS (BoolS true, FloatS 2.3, FloatS 4.3)) = IfC(BoolC true, FloatC 2.3, FloatC 4.3)
@@ -45,10 +45,13 @@ let t5a = evaluate (EqC (IntC 20, IntC 20)) = (BoolT, Bool true)
 let t5b = evaluate (EqC (FloatC 220., FloatC 20.)) = (BoolT, Bool false)
 let t5c = evaluate (EqC (BoolC false, BoolC false)) = (BoolT, Bool true) 
 let t5d = evaluate (EqC (BoolC true, BoolC true)) = (BoolT, Bool true)
-let t5e = evaluate (EqC (FloatC 20., BoolC true)) = (BoolT, Bool false)
+
+let t5e = try ((evaluate (EqC (FloatC 20., BoolC true))); false) with
+                | Failure "Typecheck" -> true
+                | _ -> false
 let t5f = desugar  (EqS (FloatS 20., BoolS true)) = EqC (FloatC 20., BoolC true)
 let t5g = desugar  (NeqS (FloatS 20., BoolS true)) =  IfC (EqC (FloatC 20., BoolC true), BoolC false, BoolC true) 
-*)
+
 
 let t6a = desugar (TupleS [FloatS 2. ; IntS 5]) = (TupleC [FloatC 2. ; IntC 5])
 let t6b = evaluate (desugar (TupleS [FloatS 1.;BoolS true ; IntS 4])) = (TupleT [FloatT; BoolT; IntT], Tuple [Float 1.; Bool true; Int 4])    
