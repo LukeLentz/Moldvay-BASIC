@@ -11,12 +11,13 @@
 %token PLUS MINUS TIMES DIVIDE PLUSF MINUSF TIMESF DIVIDEF
 %token <string> COMPOP 
 %token EQ NEQ
+%token DEFINE
 
 %nonassoc ELSE
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
 %nonassoc NOT
-%nonassoc COMPOP
+%nonassoc COMPOP DEFINE
 %left PLUS MINUS PLUSF MINUSF
 %left TIMES DIVIDE TIMESF DIVIDEF
 %token DBLSEMI
@@ -50,10 +51,11 @@ expr:
   | expr MINUS expr 			       { ArithS("-",$1,$3)}
   | expr MINUSF expr             { ArithS("-.",$1,$3)}
   | expr TIMES expr 		         { ArithS("*",$1,$3)}
-  | expr TIMESF expr              { ArithS("*.",$1,$3)}
+  | expr TIMESF expr             { ArithS("*.",$1,$3)}
   | expr DIVIDE expr 		 	       { ArithS("/",$1,$3)}
-  | expr DIVIDEF expr             { ArithS("/.",$1,$3)}
+  | expr DIVIDEF expr            { ArithS("/.",$1,$3)}
   | expr COMPOP expr 			       { CompS ($2, $1, $3) }
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
+  | DEFINE expr expr             { LetS ($2, $3) }
 ;

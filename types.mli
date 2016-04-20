@@ -12,6 +12,7 @@ type exprC = IntC of int
                   | TupleC of exprC list
                   | ListC of exprC list
                   | VarC of string
+                  | LetC of string * exprC
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -29,6 +30,7 @@ type exprS = IntS of int
                   | TupleS of exprS list
                   | ListS of exprS list
                   | VarS of string
+                  | LetS of string * exprS
 
 type value = Int of int 
                   | Float of float

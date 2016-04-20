@@ -17,6 +17,7 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
+let define = "define" 
 
 rule token = parse
   | white       { token lexbuf }
@@ -45,5 +46,6 @@ rule token = parse
   | "==" 		{ EQ }
   | "!="        { NEQ }
   | comp as s   { COMPOP s }
+  | define { DEFINE }
   | eof         { raise Eof }
   | any         { raise Unrecognized }

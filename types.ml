@@ -12,6 +12,7 @@ type exprC = IntC of int
                   | TupleC of exprC list
                   | ListC of exprC list
                   | VarC of string
+                  | LetC of string * exprC
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -29,6 +30,7 @@ type exprS = IntS of int
                   | TupleS of exprS list
                   | ListS of exprS list
                   | VarS of string
+                  | LetS of string * exprS
 
 type value = Int of int 
                   | Float of float
@@ -81,6 +83,7 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | VarS v -> VarC v
+  | LetS v e -> LetC v (desugar e)
 
 
   
@@ -149,7 +152,8 @@ let rec interp env r = match r with
                                      | _ -> raise (Failure "Not a Bool"))
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
-  | VarC v -> lookup env v
+  | VarC v -> interp env (lookup env v)
+  | LetC v e -> bind v e env
 
 let rec tc env e =
     match e with
