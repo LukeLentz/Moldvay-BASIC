@@ -157,10 +157,8 @@ let rec interp env r = match r with
   | ListC lst -> List (List.map (interp env) lst)
   | VarC v -> match (lookup v env) with
               |Some v -> interp env v
-              |None -> raise(Failure "lookup")
-  | LetC (v, e) -> match (bind v e env) with
-                   |Some v -> Env 
-                   |None -> raise(Failure "bind")
+              |None -> raise(Failure "Lookup")
+  | LetC (v, e) -> Env (bind v e env)
 
 let rec tc env e =
     match e with
