@@ -11,6 +11,7 @@ type exprC = IntC of int
                   | EqC of (exprC * exprC)
                   | TupleC of exprC list
                   | ListC of exprC list
+                  | VarC of string
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -27,6 +28,7 @@ type exprS = IntS of int
                   | NeqS of (exprS * exprS)
                   | TupleS of exprS list
                   | ListS of exprS list
+                  | VarS of string
 
 type value = Int of int 
                   | Float of float
@@ -78,6 +80,7 @@ let rec desugar exprS = match exprS with
   | NeqS (x, y) -> desugar (NotS (EqS (x, y)))
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
+  | VarS v -> VarC v
 
 
   
@@ -144,8 +147,9 @@ let rec interp env r = match r with
                                      | Bool true -> interp env op1
                                      | Bool false -> interp env op2
                                      | _ -> raise (Failure "Not a Bool"))
-     | TupleC lst -> Tuple (List.map (interp env) lst)
-     | ListC lst -> List (List.map (interp env) lst)
+  | TupleC lst -> Tuple (List.map (interp env) lst)
+  | ListC lst -> List (List.map (interp env) lst)
+  | VarC v -> lookup env v
 
 let rec tc env e =
     match e with
