@@ -18,6 +18,7 @@ let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
 let define = "define" 
+let variable = ['a'-'Z']+
 
 rule token = parse
   | white       { token lexbuf }
@@ -27,6 +28,7 @@ rule token = parse
   | int as x    { INT (int_of_string x) }
   | true        { TRUE }
   | false       { FALSE }
+  | variable as s { VARIABLE s}
   | "if" 		{ IF }
   | "then"		{ THEN }
   | "else"		{ ELSE }

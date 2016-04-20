@@ -38,6 +38,7 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
 
+
 type types = IntT
                   | FloatT
                   | BoolT
@@ -84,7 +85,7 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | VarS v -> VarC v
-  | LetS (v, e) -> LetC (desugar v, desugar e)
+  | LetS (v, e) -> LetC (v, desugar e)
 
 
   
