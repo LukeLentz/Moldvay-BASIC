@@ -155,9 +155,9 @@ let rec interp env r = match r with
                                      | _ -> raise (Failure "Not a Bool"))
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
-  | VarC v -> match (lookup v env) with
+  | VarC v -> (match (lookup v env) with
               |Some v -> interp env v
-              |None -> raise(Failure "Lookup")
+              |None -> raise(Failure "Lookup"))
   | LetC (v, e) -> Env (bind v e env)
 
 let rec tc env e =

@@ -17,7 +17,7 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
-let variable = ['a'-'Z']+
+let variable = "x"
 
 rule token = parse
   | white       { token lexbuf }
