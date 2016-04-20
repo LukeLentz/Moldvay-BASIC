@@ -17,7 +17,6 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
-let define = "define" 
 let variable = ['a'-'Z']+
 
 rule token = parse
