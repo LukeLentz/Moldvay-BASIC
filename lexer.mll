@@ -48,6 +48,6 @@ rule token = parse
   | "==" 		{ EQ }
   | "!="        { NEQ }
   | comp as s   { COMPOP s }
-  | define { DEFINE }
+  | "define" { DEFINE }
   | eof         { raise Eof }
   | any         { raise Unrecognized }
