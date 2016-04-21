@@ -17,9 +17,9 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
-let variable = "x"
+let variable = ['a'-'Z']+
 
-rule token = parse
+rule token = parseefin
   | white       { token lexbuf }
   | newline     { token lexbuf }
   | dblsemi     { DBLSEMI }
