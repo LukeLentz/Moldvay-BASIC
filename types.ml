@@ -194,6 +194,7 @@ let rec tc env e =
                           | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
+    | LetC (v, e) -> tc env e
     | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
