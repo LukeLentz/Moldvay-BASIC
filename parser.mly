@@ -9,15 +9,17 @@
 %token IF THEN ELSE
 %token OR AND NOT XOR NAND
 %token PLUS MINUS TIMES DIVIDE PLUSF MINUSF TIMESF DIVIDEF
-%token <string> COMPOP VARIABLE
+%token <string> COMPOP
+%token <string> VARIABLE
 %token EQ NEQ
-%token DEFINE
+%token LET BE
 
 %nonassoc ELSE
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
 %nonassoc NOT
-%nonassoc COMPOP DEFINE VARIABLE
+%nonassoc COMPOP
+%nonassoc LET BE
 %left PLUS MINUS PLUSF MINUSF
 %left TIMES DIVIDE TIMESF DIVIDEF
 %token DBLSEMI
@@ -57,5 +59,5 @@ expr:
   | expr COMPOP expr 			       { CompS ($2, $1, $3) }
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
-  | DEFINE VARIABLE expr        { LetS ($2, $3) }
+  | LET VARIABLE BE expr        { LetS ($2, $4) }
 ;

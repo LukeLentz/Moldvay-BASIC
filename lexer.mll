@@ -17,9 +17,8 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
-let variable = ['a'-'Z']+
 
-rule token = parseefin
+rule token = parse
   | white       { token lexbuf }
   | newline     { token lexbuf }
   | dblsemi     { DBLSEMI }
@@ -27,7 +26,7 @@ rule token = parseefin
   | int as x    { INT (int_of_string x) }
   | true        { TRUE }
   | false       { FALSE }
-  | variable as s { VARIABLE s}
+  | "x" { VARIABLE }
   | "if" 		{ IF }
   | "then"		{ THEN }
   | "else"		{ ELSE }
@@ -46,7 +45,8 @@ rule token = parseefin
   | "/."     { DIVIDEF }
   | "==" 		{ EQ }
   | "!="        { NEQ }
+  | "let"  { LET }
+  | "="  { BE }
   | comp as s   { COMPOP s }
-  | "define" { DEFINE }
   | eof         { raise Eof }
   | any         { raise Unrecognized }
