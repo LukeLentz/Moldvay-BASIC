@@ -38,6 +38,7 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
                   | Env of (string * exprC) list
+                  | Var of string
 
 
 type types = IntT
@@ -46,6 +47,7 @@ type types = IntT
                   | TupleT of types list
                   | ListT of types list
                   | AnyT
+                  | VarT
 
 
 type 'a env = (string * 'a) list
@@ -195,6 +197,7 @@ let rec tc env e =
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
     | LetC (v, e) -> tc env e
+    | VarC  v -> VarT
     | _ -> raise (Failure "Typecheck")
 
 (* evaluate : exprC -> val *)
@@ -213,6 +216,7 @@ let rec valToString r = match r with
   | Bool b          -> string_of_bool b
   | Tuple lst ->  (String.concat " * " ((List.map (valToString) lst)))
   | List lst -> (String.concat " * " ((List.map (valToString) lst)))
+  | Var s -> s
 (*   | Env e -> (String.concat " * " ((List.map (valToString) e))) *)
 
 
@@ -224,6 +228,8 @@ let rec typeToString t =
     | TupleT lst -> "TupleT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
     | ListT lst -> "ListT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
     | AnyT -> "AnyT "
+    | VarT -> "VarT"
+
 
 let pairToString (t,r) = 
     (typeToString t) ^ (valToString r)

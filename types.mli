@@ -38,6 +38,7 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
                   | Env of (string * exprC) list
+                  | Var of string
 
 type types = IntT
                   | FloatT
@@ -45,6 +46,7 @@ type types = IntT
                   | TupleT of types list
                   | ListT of types list
                   | AnyT
+                  | VarT
 
 
 (* Environment lookup *)
