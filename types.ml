@@ -12,7 +12,7 @@ type exprC = IntC of int
                   | TupleC of exprC list
                   | ListC of exprC list
                   | VarC of string
-                  | LetC of (string * exprC * exprC)
+                  | LetC of (exprC * exprC * exprC)
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -30,7 +30,7 @@ type exprS = IntS of int
                   | TupleS of exprS list
                   | ListS of exprS list
                   | VarS of string
-                  | LetS of (string * exprS * exprS)
+                  | LetS of (exprS * exprS * exprS)
 
 type value = Int of int 
                   | Float of float
@@ -87,7 +87,7 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | VarS v -> VarC v
-  | LetS (v, e1, e2) -> LetC (v, desugar e1, desugar e2)
+  | LetS (v, e1, e2) -> LetC (desugar v, desugar e1, desugar e2)
 
 
   
@@ -137,12 +137,21 @@ let rec interp env r = match r with
   | ArithC (op, x, y) -> (match (x, y) with
                                     | (IntC v, IntC n) -> arithEval op (Int v) (Int n)
                                     | (FloatC v, FloatC n) -> arithEval op (Float v) (Float n)
-                                    | (IntC v, ArithC n) -> arithEval op (Int v) (interp env (ArithC n))
-                                    | (FloatC v, ArithC n) -> arithEval op (Float v) (interp env (ArithC n)) 
-
-                                    | (ArithC v, IntC n) -> arithEval op (interp env (ArithC v)) (Int n)
-                                    | (ArithC v, FloatC n) -> arithEval op (interp env (ArithC v)) (Float n)
+                                    | (VarC v, VarC n) -> arithEval op (Var v) (Var n)
                                     | (ArithC v, ArithC n) -> arithEval op (interp env (ArithC v)) (interp env (ArithC n))
+
+                                    | (IntC v, ArithC n) -> arithEval op (Int v) (interp env (ArithC n))
+                                    | (ArithC v, IntC n) -> arithEval op (interp env (ArithC v)) (Int n)
+                                    | (FloatC v, ArithC n) -> arithEval op (Float v) (interp env (ArithC n)) 
+                                    | (ArithC v, FloatC n) -> arithEval op (interp env (ArithC v)) (Float n)                            
+                                    | (VarC v, ArithC n) -> arithEval op (Var v) (interp env (ArithC n))
+                                    | (ArithC v, VarC n) -> arithEval op (interp env (ArithC v)) (Var n)
+
+                                    | (FloatC v, VarC n) -> arithEval op (Float v) (Var n)
+                                    | (VarC v, FloatC n) -> arithEval op (Var v) (Float n)
+                                    | (IntC v, VarC n) -> arithEval op (Int v) (Var n)
+                                    | (VarC v, IntC n) -> arithEval op (Var v) (Int n)
+
                                     | _ -> raise (Failure "Interp") )
   | CompC (op, x, y) -> (match (x, y) with
                                       | (IntC x, IntC y) -> compEval op (Int x) (Int y)
@@ -157,9 +166,11 @@ let rec interp env r = match r with
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
   | VarC v -> (match (lookup v env) with
-              |Some v -> v
-              |None -> raise(Failure "Lookup"))
-| LetC (v, e1, e2) -> interp (bind v (interp env e1) env) e2
+              | Some v -> v
+              | None -> raise(Failure "Lookup"))
+| LetC (v, e1, e2) -> (match (v, e1, e2) with
+                                | (VarC v, e1, e2) -> interp (bind (VarC v) (interp env e1) env) e2
+                                | _ -> raise (Failure "Interp"))
 
 let rec tc env e =
     match e with
