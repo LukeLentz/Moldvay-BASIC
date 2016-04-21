@@ -12,7 +12,7 @@ type exprC = IntC of int
                   | TupleC of exprC list
                   | ListC of exprC list
                   | VarC of string
-                  | LetC of (string * exprC)
+                  | LetC of (string * exprC * exprC)
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -30,14 +30,13 @@ type exprS = IntS of int
                   | TupleS of exprS list
                   | ListS of exprS list
                   | VarS of string
-                  | LetS of (string * exprS)
+                  | LetS of (string * exprS * exprS)
 
 type value = Int of int 
                   | Float of float
                   | Bool of bool
                   | Tuple of value list
                   | List of value list
-                  | Env of (string * exprC) list
                   | Var of string
 
 
@@ -88,7 +87,7 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | VarS v -> VarC v
-  | LetS (v, e) -> LetC (v, desugar e)
+  | LetS (v, e1, e2) -> LetC (v, desugar e1, desugar e2)
 
 
   
@@ -158,9 +157,9 @@ let rec interp env r = match r with
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
   | VarC v -> (match (lookup v env) with
-              |Some v -> interp env v
+              |Some v -> v
               |None -> raise(Failure "Lookup"))
-  | LetC (v, e) -> Env (bind v e env)
+| LetC (v, e1, e2) -> interp (bind v (interp env e1) env) e2
 
 let rec tc env e =
     match e with
@@ -196,7 +195,7 @@ let rec tc env e =
                           | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
-    | LetC (v, e) -> tc env e
+    | LetC (v, e1, e2) -> tc (bind v (tc env e1) env) e2
     | VarC  v -> VarT
     | _ -> raise (Failure "Typecheck")
 

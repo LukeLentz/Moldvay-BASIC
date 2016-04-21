@@ -12,7 +12,7 @@ type exprC = IntC of int
                   | TupleC of exprC list
                   | ListC of exprC list
                   | VarC of string
-                  | LetC of (string * exprC)
+                  | LetC of (string * exprC * exprC)
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -30,14 +30,13 @@ type exprS = IntS of int
                   | TupleS of exprS list
                   | ListS of exprS list
                   | VarS of string
-                  | LetS of (string * exprS)
+                  | LetS of (string * exprS * exprS)
 
 type value = Int of int 
                   | Float of float
                   | Bool of bool
                   | Tuple of value list
                   | List of value list
-                  | Env of (string * exprC) list
                   | Var of string
 
 type types = IntT
@@ -57,7 +56,7 @@ val bind :  string -> 'a -> 'a env -> 'a env
 
 (* Interpreter steps *)
 val desugar : exprS -> exprC
-val interp : (string * exprC) list -> exprC -> value
+val interp : value env -> exprC -> value 
 val evaluate : exprC -> types * value
 
 (* result post-processing *)

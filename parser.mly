@@ -59,5 +59,5 @@ expr:
   | expr COMPOP expr 			       { CompS ($2, $1, $3) }
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
-  | LET VARIABLE BE expr       { LetS ($2, $4) }
+  | LET VARIABLE BE expr IN expr      { LetS ($2, $4, $6) }
 ;
