@@ -55,3 +55,11 @@ let t5g = desugar  (NeqS (FloatS 20., BoolS true)) =  IfC (EqC (FloatC 20., Bool
 
 let t6a = desugar (TupleS [FloatS 2. ; IntS 5]) = (TupleC [FloatC 2. ; IntC 5])
 let t6b = evaluate (desugar (TupleS [FloatS 1.;BoolS true ; IntS 4])) = (TupleT [FloatT; BoolT; IntT], Tuple [Float 1.; Bool true; Int 4])    
+let t6c = desugar (ListS [FloatS 2. ; FloatS 5.]) = (ListC [FloatC 2. ; FloatC 5.])
+let t6d = try (evaluate(desugar (ListS [FloatS 2. ; IntS 5])); false) with
+                | Failure "Typecheck" -> true
+                | _ -> false
+
+
+
+let t7a = desugar (VarS "Hello") = VarC "Hello"
