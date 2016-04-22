@@ -159,6 +159,9 @@ let rec tc env e =
     | ArithC (op, x, y) -> (match op with
                                       | "+" | "-" | "*" | "/" -> (match ((tc env x), (tc env y)) with
                                                                           | (IntT, IntT) -> IntT
+                                                                          | (VarT, VarT) -> IntT
+                                                                          | (VarT, IntT) -> IntT
+                                                                          | (IntT, VarT) -> IntT
                                                                           | _ -> raise (Failure "Typecheck"))
                                       | "+." | "-." | "*." | "/." -> (match ((tc env x), (tc env y)) with
                                                                               | (FloatT, FloatT) -> FloatT
