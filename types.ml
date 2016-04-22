@@ -13,6 +13,7 @@ type exprC = IntC of int
                   | ListC of exprC list
                   | VarC of string
                   | LetC of (string * exprC * exprC)
+                  | FunC of (string * exprC)
                   | ArgC of string
                   | CallC of exprC
 
@@ -33,6 +34,7 @@ type exprS = IntS of int
                   | ListS of exprS list
                   | VarS of string
                   | LetS of (string * exprS * exprS)
+                  | FunS of (string * exprS)
                   | ArgS of string
                   | CallC of exprC
 
