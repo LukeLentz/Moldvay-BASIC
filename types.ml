@@ -177,57 +177,37 @@ let rec tc env e =
     | IntC i -> IntT
     | FloatC c -> FloatT
     | BoolC b -> BoolT
-    | ArithC (op, VarC x, VarC y) -> (match op with
-                                                    | "+" | "-" | "*" | "/" -> IntT
-                                                    | "+." | "-." | "*." | "/." -> FloatT (* if it's two vars, it can be a float or int expr *)
-                                                    | _ -> raise (Failure "Typecheck"))
-    | ArithC (op, IntC x, IntC y) -> (match op with
-                                                    | "+" | "-" | "*" | "/" -> IntT
-                                                    | _ -> raise (Failure "Typecheck"))
-    | ArithC (op, VarC x, IntC y) -> (match op with
-                                                    | "+" | "-" | "*" | "/" -> IntT
-                                                    | _ -> raise (Failure "Typecheck"))
-    | ArithC (op, IntC x, VarC y) -> (match op with
-                                                    | "+" | "-" | "*" | "/" -> IntT
-                                                    | _ -> raise (Failure "Typecheck"))
-    | ArithC (op, FloatC x, FloatC y) -> (match op with
-                                                            | "+." | "-." | "*." | "/." -> FloatT
-                                                            | _ -> raise (Failure "Typecheck"))
-    | ArithC (op, VarC x, FloatC y) -> (match op with
-                                                            | "+." | "-." | "*." | "/." -> FloatT
-                                                            | _ -> raise (Failure "Typecheck"))
-    | ArithC (op, FloatC x, VarC y) -> (match op with
-                                                            | "+." | "-." | "*." | "/." -> FloatT
-                                                            | _ -> raise (Failure "Typecheck"))                                                                                 
+    | ArithC (op, x, y) -> (match op with
+                                      | "+" | "-" | "*" | "/" -> (match (x, y) with
+                                                                          | (IntC x, IntC y) -> IntT
+                                                                          | (VarC x, VarC y) -> IntT
+                                                                          | (VarC x, IntC y) -> IntT
+                                                                          | (IntC x, VarC y) -> IntT
+                                                                          | _ -> raise (Failure "Typecheck"))
+                                      | "+." | "-." | "*." | "/." -> (match (x, y) with
+                                                                              | (FloatC x, FloatC y) -> FloatT
+                                                                              | (VarC x, VarC y) -> FloatT
+                                                                              | (VarC x, FloatC y) -> FloatT
+                                                                              | (FloatC x, VarC y) -> FloatT
+                                                                              | _ -> raise (Failure "Typecheck"))
+                                      | _ -> raise (Failure "Typecheck"))
     | IfC (test, thn, els) -> (match (tc env test) with
                                           | BoolT -> if ((tc env thn) = (tc env els))
                                                            then (tc env thn) (* thn and els are the same type so either is fine *)
                                                            else raise (Failure "Typecheck")
-                                          | VarT -> if ((interp env test) = (Bool)) and ((tc env thn) = (tc env els))
-                                                          then (tc env thn)
-                                                          else raise (Failure "Typecheck")
                                           | _ -> raise (Failure "Typecheck"))
-    | CompC (op, IntC x, IntC y) -> (match op with
-                                                      | ">" | "<" | "<=" | ">=" -> BoolT
-                                                      | _ -> raise (Failure "Typecheck"))
-    | CompC (op, FloatC x, FloatC y) -> (match op with
-                                                              | ">" | "<" | "<=" | ">=" -> BoolT
-                                                              | _ -> raise (Failure "Typecheck"))
-    | CompC (op, VarC x, VarC y) -> (match op with
-                                                      | ">" | "<" | "<=" | ">=" -> BoolT
-                                                      | _ -> raise (Failure "Typecheck"))
-    | CompC (op, IntC x, VarC y) -> (match op with
-                                                      | ">" | "<" | "<=" | ">=" -> BoolT
-                                                      | _ -> raise (Failure "Typecheck"))
-    | CompC (op, VarC x, IntC y) -> (match op with
-                                                      | ">" | "<" | "<=" | ">=" -> BoolT
-                                                      | _ -> raise (Failure "Typecheck"))
-    | CompC (op, FloatC x, VarC y) -> (match op with
-                                                      | ">" | "<" | "<=" | ">=" -> BoolT
-                                                      | _ -> raise (Failure "Typecheck"))
-    | CompC (op, VarC x, FloatC y) -> (match op with
-                                                      | ">" | "<" | "<=" | ">=" -> BoolT
-                                                      | _ -> raise (Failure "Typecheck"))                                                                                                                                                                                                                     
+    | CompC (op, x, y) -> (match op with
+                                        | ">" | "<" | "<=" | ">=" -> (match (x, y) with
+                                                                                     | (IntC x, IntC y) -> BoolT
+                                                                                     | (FloatC x, FloatC y) -> BoolT
+                                                                                     | (VarC x, VarC y) -> BoolT
+                                                                                     | (IntC x, VarC y) -> BoolT
+                                                                                     | (VarC x, IntC y) -> BoolT
+                                                                                     | (FloatC x, VarC y) -> BoolT
+                                                                                     | (VarC x, FloatC y) -> BoolT
+                                                                                     | _ -> raise (Failure "Typecheck"))
+                                        | _ -> raise (Failure "Typecheck"))
+    (* must raise two exceptions because the op or the (x, y) can be wrong *)
     | EqC (x, y) -> (match (x, y) with
                               | (IntC x, IntC y) -> BoolT
                               | (FloatC x, FloatC y) -> BoolT
@@ -250,6 +230,49 @@ let rec tc env e =
     | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
     | VarC  v -> VarT
     | _ -> raise (Failure "Typecheck")
+(*     | ArithC (op, VarC x, VarC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | "+." | "-." | "*." | "/." -> FloatT (* if it's two vars, it can be a float or int expr *)
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, IntC x, IntC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, VarC x, IntC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, IntC x, VarC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, FloatC x, FloatC y) -> (match op with
+                                                            | "+." | "-." | "*." | "/." -> FloatT
+                                                            | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, VarC x, FloatC y) -> (match op with
+                                                            | "+." | "-." | "*." | "/." -> FloatT
+                                                            | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, FloatC x, VarC y) -> (match op with
+                                                            | "+." | "-." | "*." | "/." -> FloatT
+                                                            | _ -> raise (Failure "Typecheck"))   *)                                                                     
+(*     | CompC (op, IntC x, IntC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, FloatC x, FloatC y) -> (match op with
+                                                              | ">" | "<" | "<=" | ">=" -> BoolT
+                                                              | _ -> raise (Failure "Typecheck"))
+    | CompC (op, VarC x, VarC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, IntC x, VarC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, VarC x, IntC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, FloatC x, VarC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, VarC x, FloatC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck")) *)
 
 (* evaluate : exprC -> val *)
 (*let evaluate exprC = exprC |> interp []*)
