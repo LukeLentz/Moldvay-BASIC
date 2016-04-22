@@ -17,7 +17,7 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
-let var = ^'\w'+
+let var = ['a'-'z' 'A'-'Z']+
 
 rule token = parse
   | white       { token lexbuf }

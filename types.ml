@@ -12,7 +12,7 @@ type exprC = IntC of int
                   | TupleC of exprC list
                   | ListC of exprC list
                   | VarC of string
-                  | LetC of (exprC * exprC * exprC)
+                  | LetC of (string * exprC * exprC)
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -30,7 +30,7 @@ type exprS = IntS of int
                   | TupleS of exprS list
                   | ListS of exprS list
                   | VarS of string
-                  | LetS of (exprS * exprS * exprS)
+                  | LetS of (string * exprS * exprS)
 
 type value = Int of int 
                   | Float of float
@@ -87,7 +87,7 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | VarS v -> VarC v
-  | LetS (v, e1, e2) -> LetC (desugar v, desugar e1, desugar e2)
+  | LetS (s, e1, e2) -> LetC (s, desugar e1, desugar e2)
 
 
   
@@ -170,7 +170,7 @@ let rec interp env r = match r with
   | VarC v -> (match (lookup v env) with
                       | Some v -> v
                       | None -> raise(Failure "Lookup"))
-  | LetC (v, e1, e2) -> interp (bind v (interp env e1) env) e2
+  | LetC (s, e1, e2) -> interp (bind s (interp env e1) env) e2
 
 let rec tc env e =
     match e with
@@ -206,7 +206,7 @@ let rec tc env e =
                           | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
-    | LetC (v, e1, e2) -> tc (bind v (tc env e1) env) e2
+    | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
     | VarC  v -> VarT
     | _ -> raise (Failure "Typecheck")
 
@@ -238,7 +238,7 @@ let rec typeToString t =
     | TupleT lst -> "TupleT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
     | ListT lst -> "ListT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
     | AnyT -> "AnyT "
-    | VarT -> "VarT"
+    | VarT -> "VarT "
 
 
 let pairToString (t,r) = 
