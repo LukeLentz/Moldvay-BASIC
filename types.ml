@@ -177,12 +177,28 @@ let rec tc env e =
     | IntC i -> IntT
     | FloatC c -> FloatT
     | BoolC b -> BoolT
+    | ArithC (op, VarC x, VarC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | "+." | "-." | "*." | "/." -> FloatT (* if it's two vars, it can be a float or int expr *)
+                                                    | _ -> raise (Failure "Typecheck"))
     | ArithC (op, IntC x, IntC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, VarC x, IntC y) -> (match op with
+                                                    | "+" | "-" | "*" | "/" -> IntT
+                                                    | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, IntC x, VarC y) -> (match op with
                                                     | "+" | "-" | "*" | "/" -> IntT
                                                     | _ -> raise (Failure "Typecheck"))
     | ArithC (op, FloatC x, FloatC y) -> (match op with
                                                             | "+." | "-." | "*." | "/." -> FloatT
                                                             | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, VarC x, FloatC y) -> (match op with
+                                                            | "+." | "-." | "*." | "/." -> FloatT
+                                                            | _ -> raise (Failure "Typecheck"))
+    | ArithC (op, FloatC x, VarC y) -> (match op with
+                                                            | "+." | "-." | "*." | "/." -> FloatT
+                                                            | _ -> raise (Failure "Typecheck"))                                                                                 
     | IfC (test, thn, els) -> (match (tc env test) with
                                           | BoolT -> if ((tc env thn) = (tc env els))
                                                            then (tc env thn) (* thn and els are the same type so either is fine *)
