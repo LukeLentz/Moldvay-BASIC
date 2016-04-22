@@ -42,6 +42,7 @@ expr:
   | INT                          { IntS $1 }
   | TRUE                         { BoolS true }
   | FALSE                        { BoolS false }
+  | VARIABLE                    { VarS $1 }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
   | expr AND expr 				       { AndS($1 , $3) }
