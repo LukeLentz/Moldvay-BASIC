@@ -48,6 +48,8 @@ rule token = parse
   | "let"  { LET }
   | "="  { BE }
   | "in"  { IN }
+  | "("    { OPEN }
+  | ")"     { CLOSE }
   | var as x { VARIABLE x}
   | comp as s   { COMPOP s }
   | eof         { raise Eof }

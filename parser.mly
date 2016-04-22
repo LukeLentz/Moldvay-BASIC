@@ -13,7 +13,9 @@
 %token <string> VARIABLE
 %token EQ NEQ
 %token LET BE IN
+%token OPEN CLOSE
 
+%nonassoc OPEN CLOSE
 %nonassoc ELSE
 %nonassoc LET BE IN
 %left OR AND XOR NAND
@@ -43,6 +45,7 @@ expr:
   | TRUE                         { BoolS true }
   | FALSE                        { BoolS false }
   | VARIABLE                    { VarS $1 }
+  | OPEN expr CLOSE       { $2 }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
   | expr AND expr 				       { AndS($1 , $3) }
