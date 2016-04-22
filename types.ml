@@ -129,30 +129,13 @@ let rec interp env r = match r with
   | IntC i         -> Int i
   | FloatC f       -> Float f
   | BoolC b        -> Bool b
-  | ArithC (op, x, y) -> (match (x, y) with
-                                    | (IntC v, IntC n) -> arithEval op (Int v) (Int n)
-                                    | (FloatC v, FloatC n) -> arithEval op (Float v) (Float n)
-                                    | (VarC v, VarC n) -> arithEval op (interp env (VarC v)) (interp env (VarC n))
-                                    | (ArithC v, ArithC n) -> arithEval op (interp env (ArithC v)) (interp env (ArithC n))
-                                    | (IntC v, ArithC n) -> arithEval op (Int v) (interp env (ArithC n))
-                                    | (ArithC v, IntC n) -> arithEval op (interp env (ArithC v)) (Int n)
-                                    | (FloatC v, ArithC n) -> arithEval op (Float v) (interp env (ArithC n)) 
-                                    | (ArithC v, FloatC n) -> arithEval op (interp env (ArithC v)) (Float n)                            
-                                    | (VarC v, ArithC n) -> arithEval op (interp env (VarC v)) (interp env (ArithC n))
-                                    | (ArithC v, VarC n) -> arithEval op (interp env (ArithC v)) (interp env (VarC n))
-                                    | (FloatC v, VarC n) -> arithEval op (Float v) (interp env (VarC n))
-                                    | (VarC v, FloatC n) -> arithEval op (interp env (VarC v)) (Float n)
-                                    | (IntC v, VarC n) -> arithEval op (Int v) (interp env (VarC n))
-                                    | (VarC v, IntC n) -> arithEval op (interp env (VarC v)) (Int n)
+  | ArithC (op, x, y) -> (match ((interp env x), (interp env y)) with
+                                    | (Int v, Int n) -> arithEval op (Int v) (Int n)
+                                    | (Float v, Float n) -> arithEval op (Float v) (Float n)
                                     | _ -> raise (Failure "Interp"))
-  | CompC (op, x, y) -> (match (x, y) with
-                                      | (IntC x, IntC y) -> compEval op (Int x) (Int y)
-                                      | (FloatC x, FloatC y) -> compEval op (Float x) (Float y)
-                                      | (VarC x, VarC y) -> compEval op (interp env (VarC x)) (interp env (VarC y))
-                                      | (IntC x, VarC y) -> compEval op (Int x) (interp env (VarC y))
-                                      | (VarC x, IntC y) -> compEval op (interp env (VarC x)) (Int y)
-                                      | (VarC x, FloatC y) -> compEval op (interp env (VarC x)) (Float y)
-                                      | (FloatC x, VarC y) -> compEval op (Float x) (interp env (VarC y))
+  | CompC (op, x, y) -> (match ((interp env x), (interp env y)) with
+                                      | (Int x, Int y) -> compEval op (Int x) (Int y)
+                                      | (Float x, Float y) -> compEval op (Float x) (Float y)
                                       | _ -> raise (Failure "Interp"))
   | EqC (x, y) -> eqEval (interp env x) (interp env y)
   | IfC (test, op1, op2 ) -> 
@@ -172,35 +155,33 @@ let rec tc env e =
     | IntC i -> IntT
     | FloatC c -> FloatT
     | BoolC b -> BoolT
-    | VarC  v -> VarT
+    | VarC v -> VarT
     | ArithC (op, x, y) -> (match op with
-                                      | "+" | "-" | "*" | "/" -> (match (x, y) with
-                                                                          | (IntC x, IntC y) -> IntT
-                                                                          | (VarC x, VarC y) -> IntT
-                                                                          | (VarC x, IntC y) -> IntT
-                                                                          | (IntC x, VarC y) -> IntT
+                                      | "+" | "-" | "*" | "/" -> (match ((tc env x), (tc env y)) with
+                                                                          | (IntT, IntT) -> IntT
                                                                           | _ -> raise (Failure "Typecheck"))
-                                      | "+." | "-." | "*." | "/." -> (match (x, y) with
-                                                                              | (FloatC x, FloatC y) -> FloatT
-                                                                              | (VarC x, VarC y) -> FloatT
-                                                                              | (VarC x, FloatC y) -> FloatT
-                                                                              | (FloatC x, VarC y) -> FloatT
+                                      | "+." | "-." | "*." | "/." -> (match ((tc env x), (tc env y)) with
+                                                                              | (FloatT, FloatT) -> FloatT
+                                                                              | (VarT, VarT) -> FloatT
+                                                                              | (VarT, FloatT) -> FloatT
+                                                                              | (FloatT, VarT) -> FloatT
                                                                               | _ -> raise (Failure "Typecheck"))
                                       | _ -> raise (Failure "Typecheck"))
     | IfC (test, thn, els) -> (match (tc env test) with
+                                          | VarT
                                           | BoolT -> if ((tc env thn) = (tc env els))
-                                                           then (tc env thn) (* thn and els are the same type so either is fine *)
+                                                           then BoolT
                                                            else raise (Failure "Typecheck")
                                           | _ -> raise (Failure "Typecheck"))
     | CompC (op, x, y) -> (match op with
-                                        | ">" | "<" | "<=" | ">=" -> (match (x, y) with
-                                                                                     | (IntC x, IntC y) -> BoolT
-                                                                                     | (FloatC x, FloatC y) -> BoolT
-                                                                                     | (VarC x, VarC y) -> BoolT
-                                                                                     | (IntC x, VarC y) -> BoolT
-                                                                                     | (VarC x, IntC y) -> BoolT
-                                                                                     | (FloatC x, VarC y) -> BoolT
-                                                                                     | (VarC x, FloatC y) -> BoolT
+                                        | ">" | "<" | "<=" | ">=" -> (match ((tc env x), (tc env y)) with
+                                                                                     | (IntT, IntT) -> BoolT
+                                                                                     | (FloatT, FloatT) -> BoolT
+                                                                                     | (VarT, VarT) -> BoolT
+                                                                                     | (IntT, VarT) -> BoolT
+                                                                                     | (VarT, IntT) -> BoolT
+                                                                                     | (FloatT, VarT) -> BoolT
+                                                                                     | (VarT, FloatT) -> BoolT
                                                                                      | _ -> raise (Failure "Typecheck"))
                                         | _ -> raise (Failure "Typecheck"))
     (* must raise two exceptions because the op or the (x, y) can be wrong *)
