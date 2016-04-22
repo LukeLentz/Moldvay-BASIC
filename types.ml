@@ -74,6 +74,7 @@ let rec desugar exprS = match exprS with
   | IntS i        -> IntC i
   | FloatS f    -> FloatC f
   | BoolS b       -> BoolC b
+  | VarS v -> VarC v
   | IfS (a, b, c) -> IfC (desugar a, desugar b, desugar c)
   | AndS (x, y)   -> desugar (IfS (x, IfS (y, BoolS true, BoolS false), BoolS false))
   | NAndS (x, y) -> desugar (NotS (AndS (x, y)))
@@ -86,13 +87,7 @@ let rec desugar exprS = match exprS with
   | NeqS (x, y) -> desugar (NotS (EqS (x, y)))
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
-  | VarS v -> VarC v
   | LetS (s, e1, e2) -> LetC (s, desugar e1, desugar e2)
-
-
-  
-
-
 
   let arithEval op v1 v2 =
     match (op, v1, v2) with
@@ -177,6 +172,7 @@ let rec tc env e =
     | IntC i -> IntT
     | FloatC c -> FloatT
     | BoolC b -> BoolT
+    | VarC  v -> VarT
     | ArithC (op, x, y) -> (match op with
                                       | "+" | "-" | "*" | "/" -> (match (x, y) with
                                                                           | (IntC x, IntC y) -> IntT
@@ -208,7 +204,17 @@ let rec tc env e =
                                                                                      | _ -> raise (Failure "Typecheck"))
                                         | _ -> raise (Failure "Typecheck"))
     (* must raise two exceptions because the op or the (x, y) can be wrong *)
-    | EqC (x, y) -> (match (x, y) with
+    | EqC (x, y) -> BoolT (* any two exprs can be compared *)
+    | TupleC lst -> TupleT (List.map (tc env) lst)
+    | ListC lst -> (match lst with
+                          | [] -> AnyT
+                          | (x :: []) -> ListT ((tc env x) :: [])
+                          | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
+                                               then ListT (List.map (tc env) lst)
+                                               else raise (Failure "Typecheck")))
+    | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
+    | _ -> raise (Failure "Typecheck")
+(*     | EqC (x, y) -> (match (x, y) with
                               | (IntC x, IntC y) -> BoolT
                               | (FloatC x, FloatC y) -> BoolT
                               | (BoolC x, BoolC y) -> BoolT
@@ -219,17 +225,7 @@ let rec tc env e =
                               | (VarC x, FloatC y) -> BoolT
                               | (BoolC x, VarC y) -> BoolT
                               | (VarC x, BoolC y) -> BoolT
-                              | _ -> raise (Failure "Typecheck"))
-    | TupleC lst -> TupleT (List.map (tc env) lst)
-    | ListC lst -> (match lst with
-                          | [] -> AnyT
-                          | (x :: []) -> ListT ((tc env x) :: [])
-                          | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
-                                               then ListT (List.map (tc env) lst)
-                                               else raise (Failure "Typecheck")))
-    | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
-    | VarC  v -> VarT
-    | _ -> raise (Failure "Typecheck")
+                              | _ -> raise (Failure "Tpecheck")) *)
 (*     | ArithC (op, VarC x, VarC y) -> (match op with
                                                     | "+" | "-" | "*" | "/" -> IntT
                                                     | "+." | "-." | "*." | "/." -> FloatT (* if it's two vars, it can be a float or int expr *)
@@ -282,7 +278,6 @@ let evaluate exprC =
     in let vs = interp [] exprC
       in (ts,vs)
 
-
 (* You will need to add cases to this function as you add new value types. *)
 let rec valToString r = match r with
   | Float i           -> string_of_float i
@@ -291,8 +286,6 @@ let rec valToString r = match r with
   | Tuple lst ->  (String.concat " * " ((List.map (valToString) lst)))
   | List lst -> (String.concat " * " ((List.map (valToString) lst)))
   | Var s -> s
-(*   | Env e -> (String.concat " * " ((List.map (valToString) e))) *)
-
 
 let rec typeToString t = 
     match t with
@@ -303,7 +296,6 @@ let rec typeToString t =
     | ListT lst -> "ListT: " ^ (String.concat " * " ((List.map (typeToString) lst)))
     | AnyT -> "AnyT "
     | VarT -> "VarT "
-
 
 let pairToString (t,r) = 
     (typeToString t) ^ (valToString r)
