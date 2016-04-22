@@ -13,6 +13,8 @@ type exprC = IntC of int
                   | ListC of exprC list
                   | VarC of string
                   | LetC of (string * exprC * exprC)
+                  | ArgC of string
+                  | CallC of exprC
 
 type exprS = IntS of int 
                   | FloatS of float 
@@ -31,6 +33,8 @@ type exprS = IntS of int
                   | ListS of exprS list
                   | VarS of string
                   | LetS of (string * exprS * exprS)
+                  | ArgS of string
+                  | CallC of exprC
 
 type value = Int of int 
                   | Float of float
@@ -155,23 +159,18 @@ let rec tc env e =
     | IntC i -> IntT
     | FloatC c -> FloatT
     | BoolC b -> BoolT
-    | VarC v -> VarT
+    | VarC v -> (match (lookup v env) with
+                        | Some v -> v
+                        | None -> raise (Failure "Lookup"))
     | ArithC (op, x, y) -> (match op with
                                       | "+" | "-" | "*" | "/" -> (match ((tc env x), (tc env y)) with
                                                                           | (IntT, IntT) -> IntT
-                                                                          | (VarT, VarT) -> IntT
-                                                                          | (VarT, IntT) -> IntT
-                                                                          | (IntT, VarT) -> IntT
                                                                           | _ -> raise (Failure "Typecheck"))
                                       | "+." | "-." | "*." | "/." -> (match ((tc env x), (tc env y)) with
                                                                               | (FloatT, FloatT) -> FloatT
-                                                                              | (VarT, VarT) -> FloatT
-                                                                              | (VarT, FloatT) -> FloatT
-                                                                              | (FloatT, VarT) -> FloatT
                                                                               | _ -> raise (Failure "Typecheck"))
                                       | _ -> raise (Failure "Typecheck"))
     | IfC (test, thn, els) -> (match (tc env test) with
-                                          | VarT
                                           | BoolT -> if ((tc env thn) = (tc env els))
                                                            then BoolT
                                                            else raise (Failure "Typecheck")
@@ -180,11 +179,6 @@ let rec tc env e =
                                         | ">" | "<" | "<=" | ">=" -> (match ((tc env x), (tc env y)) with
                                                                                      | (IntT, IntT) -> BoolT
                                                                                      | (FloatT, FloatT) -> BoolT
-                                                                                     | (VarT, VarT) -> BoolT
-                                                                                     | (IntT, VarT) -> BoolT
-                                                                                     | (VarT, IntT) -> BoolT
-                                                                                     | (FloatT, VarT) -> BoolT
-                                                                                     | (VarT, FloatT) -> BoolT
                                                                                      | _ -> raise (Failure "Typecheck"))
                                         | _ -> raise (Failure "Typecheck"))
     (* must raise two exceptions because the op or the (x, y) can be wrong *)
