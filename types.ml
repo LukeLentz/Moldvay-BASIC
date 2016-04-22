@@ -203,6 +203,9 @@ let rec tc env e =
                                           | BoolT -> if ((tc env thn) = (tc env els))
                                                            then (tc env thn) (* thn and els are the same type so either is fine *)
                                                            else raise (Failure "Typecheck")
+                                          | VarT -> if ((interp env test) = (Bool)) and ((tc env thn) = (tc env els))
+                                                          then (tc env thn)
+                                                          else raise (Failure "Typecheck")
                                           | _ -> raise (Failure "Typecheck"))
     | CompC (op, IntC x, IntC y) -> (match op with
                                                       | ">" | "<" | "<=" | ">=" -> BoolT
@@ -210,10 +213,32 @@ let rec tc env e =
     | CompC (op, FloatC x, FloatC y) -> (match op with
                                                               | ">" | "<" | "<=" | ">=" -> BoolT
                                                               | _ -> raise (Failure "Typecheck"))
+    | CompC (op, VarC x, VarC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, IntC x, VarC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, VarC x, IntC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, FloatC x, VarC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))
+    | CompC (op, VarC x, FloatC y) -> (match op with
+                                                      | ">" | "<" | "<=" | ">=" -> BoolT
+                                                      | _ -> raise (Failure "Typecheck"))                                                                                                                                                                                                                     
     | EqC (x, y) -> (match (x, y) with
                               | (IntC x, IntC y) -> BoolT
                               | (FloatC x, FloatC y) -> BoolT
                               | (BoolC x, BoolC y) -> BoolT
+                              | (VarC x, VarC y) -> BoolT
+                              | (VarC x, IntC y) -> BoolT
+                              | (IntC x, VarC y) -> BoolT
+                              | (FloatC x, VarC y) -> BoolT
+                              | (VarC x, FloatC y) -> BoolT
+                              | (BoolC x, VarC y) -> BoolT
+                              | (VarC x, BoolC y) -> BoolT
                               | _ -> raise (Failure "Typecheck"))
     | TupleC lst -> TupleT (List.map (tc env) lst)
     | ListC lst -> (match lst with
