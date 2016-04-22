@@ -36,7 +36,7 @@ type exprS = IntS of int
                   | LetS of (string * exprS * exprS)
                   | FunS of (string * exprS)
                   | ArgS of string
-                  | CallC of exprC
+                  | CallS of exprS
 
 type value = Int of int 
                   | Float of float

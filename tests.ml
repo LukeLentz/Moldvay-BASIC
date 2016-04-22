@@ -46,9 +46,7 @@ let t5b = evaluate (EqC (FloatC 220., FloatC 20.)) = (BoolT, Bool false)
 let t5c = evaluate (EqC (BoolC false, BoolC false)) = (BoolT, Bool true) 
 let t5d = evaluate (EqC (BoolC true, BoolC true)) = (BoolT, Bool true)
 
-let t5e = try ((evaluate (EqC (FloatC 20., BoolC true))); false) with
-                | Failure "Typecheck" -> true
-                | _ -> false
+let t5e = evaluate (EqC (FloatC 20., BoolC true)) = (BoolT, Bool false)
 let t5f = desugar  (EqS (FloatS 20., BoolS true)) = EqC (FloatC 20., BoolC true)
 let t5g = desugar  (NeqS (FloatS 20., BoolS true)) =  IfC (EqC (FloatC 20., BoolC true), BoolC false, BoolC true) 
 

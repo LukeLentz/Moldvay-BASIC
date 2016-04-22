@@ -36,7 +36,7 @@ type exprS = IntS of int
                   | LetS of (string * exprS * exprS)
                   | FunS of (string * exprS)
                   | ArgS of string
-                  | CallC of exprC
+                  | CallS of exprS
 
 type value = Int of int 
                   | Float of float
@@ -94,6 +94,9 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | LetS (s, e1, e2) -> LetC (s, desugar e1, desugar e2)
+  | FunS (arg, body) -> FunC (arg, desugar body)
+  | ArgS s -> ArgC s
+  | CallS e -> CallC (desugar e)
 
   let arithEval op v1 v2 =
     match (op, v1, v2) with
@@ -155,6 +158,7 @@ let rec interp env r = match r with
                       | Some v -> v
                       | None -> raise(Failure "Lookup"))
   | LetC (s, e1, e2) -> interp (bind s (interp env e1) env) e2
+  | FunC (arg, body) -> interp (bind arg (interp env body) env) body
 
 let rec tc env e =
     match e with
