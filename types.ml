@@ -172,7 +172,7 @@ let rec tc env e =
                                       | _ -> raise (Failure "Typecheck"))
     | IfC (test, thn, els) -> (match (tc env test) with
                                           | BoolT -> if ((tc env thn) = (tc env els))
-                                                           then BoolT
+                                                           then (tc env thn)
                                                            else raise (Failure "Typecheck")
                                           | _ -> raise (Failure "Typecheck"))
     | CompC (op, x, y) -> (match op with
