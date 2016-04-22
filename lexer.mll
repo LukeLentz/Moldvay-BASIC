@@ -17,7 +17,7 @@ let int = (digit)+
 let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
-let var = "xy"
+let var = ^'\w'+
 
 rule token = parse
   | white       { token lexbuf }
@@ -27,28 +27,28 @@ rule token = parse
   | int as x    { INT (int_of_string x) }
   | true        { TRUE }
   | false       { FALSE }
-  | var as x { VARIABLE x}
-  | "if" 		{ IF }
-  | "then"		{ THEN }
-  | "else"		{ ELSE }
-  | "or"		{ OR }
-  | "and" 		{ AND }
-  | "not" 		{ NOT }
+  | "if"        { IF }
+  | "then"      { THEN }
+  | "else"      { ELSE }
+  | "or"        { OR }
+  | "and"       { AND }
+  | "not"       { NOT }
   | "xor"     { XOR }
   | "nand"    { NAND }
-  | "+"			{ PLUS }
-  | "-"			{ MINUS }
-  | "*" 		{ TIMES }
-  | "/" 		{ DIVIDE }
+  | "+"         { PLUS }
+  | "-"         { MINUS }
+  | "*"         { TIMES }
+  | "/"         { DIVIDE }
   | "+."     { PLUSF }
   | "-."     { MINUSF }
   | "*."     { TIMESF }
   | "/."     { DIVIDEF }
-  | "==" 		{ EQ }
+  | "=="        { EQ }
   | "!="        { NEQ }
   | "let"  { LET }
   | "="  { BE }
   | "in"  { IN }
+  | var as x { VARIABLE x}
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
   | any         { raise Unrecognized }
