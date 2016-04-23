@@ -2,6 +2,14 @@ exception Desugar of string
 exception Interp of string
 exception Typecheck of string
 
+type types = IntT
+                  | FloatT
+                  | BoolT
+                  | TupleT of types list
+                  | ListT of types list
+                  | AnyT
+                  | VarT
+                  
 type exprC = IntC of int 
                   | FloatC of float 
                   | BoolC of bool 
@@ -13,7 +21,7 @@ type exprC = IntC of int
                   | ListC of exprC list
                   | VarC of string
                   | LetC of (string * exprC * exprC)
-                  | FunC of (string * exprC)
+                  | FunC of (string * types * exprC)
                   | ArgC of string
                   | CallC of exprC
 
@@ -34,7 +42,7 @@ type exprS = IntS of int
                   | ListS of exprS list
                   | VarS of string
                   | LetS of (string * exprS * exprS)
-                  | FunS of (string * exprS)
+                  | FunS of (string * types * exprS)
                   | ArgS of string
                   | CallS of exprS
 
@@ -44,15 +52,6 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
                   | Var of string
-
-
-type types = IntT
-                  | FloatT
-                  | BoolT
-                  | TupleT of types list
-                  | ListT of types list
-                  | AnyT
-                  | VarT
 
 
 type 'a env = (string * 'a) list
@@ -94,7 +93,7 @@ let rec desugar exprS = match exprS with
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
   | LetS (s, e1, e2) -> LetC (s, desugar e1, desugar e2)
-  | FunS (arg, body) -> FunC (arg, desugar body)
+  | FunS (arg, types, body) -> FunC (arg, types, desugar body)
   | ArgS s -> ArgC s
   | CallS e -> CallC (desugar e)
 
@@ -158,7 +157,7 @@ let rec interp env r = match r with
                       | Some v -> v
                       | None -> raise(Failure "Lookup"))
   | LetC (s, e1, e2) -> interp (bind s (interp env e1) env) e2
-  | FunC (arg, body) -> interp (bind arg (interp env body) env) body
+  | FunC (arg, types, body) -> interp (bind arg (interp env body) env) body
 
 let rec tc env e =
     match e with
@@ -197,6 +196,7 @@ let rec tc env e =
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
     | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
+    | FunC (arg, types, body) -> if (types = (tc env body)) then types else raise (Failure ("Typecheck"))
     | _ -> raise (Failure "Typecheck")
 (*     | EqC (x, y) -> (match (x, y) with
                               | (IntC x, IntC y) -> BoolT

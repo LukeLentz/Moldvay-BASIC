@@ -49,8 +49,6 @@ atype:
   | INTTYPE             { IntT }
   | FLOATTYPE        { FloatT }
   | BOOLTYPE           { BoolT }
-  | LISTTYPE            { ListT }
-  | TUPLETYPE           { TupleT }
 ;
 
 expr:

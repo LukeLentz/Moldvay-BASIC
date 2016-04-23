@@ -2,6 +2,14 @@ exception Desugar of string
 exception Interp of string
 exception Typecheck of string
 
+type types = IntT
+                  | FloatT
+                  | BoolT
+                  | TupleT of types list
+                  | ListT of types list
+                  | AnyT
+                  | VarT
+                  
 type exprC = IntC of int 
                   | FloatC of float 
                   | BoolC of bool 
@@ -13,7 +21,7 @@ type exprC = IntC of int
                   | ListC of exprC list
                   | VarC of string
                   | LetC of (string * exprC * exprC)
-                  | FunC of (string * exprC)
+                  | FunC of (string * types * exprC)
                   | ArgC of string
                   | CallC of exprC
 
@@ -34,7 +42,7 @@ type exprS = IntS of int
                   | ListS of exprS list
                   | VarS of string
                   | LetS of (string * exprS * exprS)
-                  | FunS of (string * exprS)
+                  | FunS of (string * types * exprS)
                   | ArgS of string
                   | CallS of exprS
 
@@ -46,13 +54,7 @@ type value = Int of int
                   | Var of string
 
 
-type types = IntT
-                  | FloatT
-                  | BoolT
-                  | TupleT of types list
-                  | ListT of types list
-                  | AnyT
-                  | VarT
+
 
 
 (* Environment lookup *)
