@@ -18,7 +18,7 @@ let true = "true" | "#t"
 let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<="
 let var = ['a'-'z' 'A'-'Z']+
-let arg = "xs"
+let arg = "arg"
 
 rule token = parse
   | white       { token lexbuf }
@@ -59,6 +59,11 @@ rule token = parse
   | "bool"  { BOOLTYPE }
   | "tuple"  { TUPLETYPE }
   | "list"         { LISTTYPE }
+  | "["             { OPENLST }
+  | "]"             { CLOSELST }
+  | "::"          { CONS }
+  | "["             { OPENLST }
+  | "]"             { CLOSELST }
   | arg as x  { ARG x }
   | var as x { VARIABLE x}
   | comp as s   { COMPOP s }

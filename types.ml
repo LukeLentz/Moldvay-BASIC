@@ -19,6 +19,7 @@ type exprC = IntC of int
                   | EqC of (exprC * exprC)
                   | TupleC of exprC list
                   | ListC of exprC list
+                  | ConsC of (exprC* exprC)
                   | VarC of string
                   | LetC of (string * exprC * exprC)
                   | FunC of (string * types * exprC)
@@ -40,6 +41,7 @@ type exprS = IntS of int
                   | NeqS of (exprS * exprS)
                   | TupleS of exprS list
                   | ListS of exprS list
+                  | ConsS of (exprS * exprS)
                   | VarS of string
                   | LetS of (string * exprS * exprS)
                   | FunS of (string * types * exprS)
@@ -52,7 +54,6 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
                   | Var of string
-
 
 type 'a env = (string * 'a) list
 
@@ -71,7 +72,7 @@ let append v lst = v :: lst
 let is_empty lst = match lst with
                             | [] -> true
                             | _ -> false
-                            
+
 let hd lst = List.hd lst
 
 let tl lst = List.tl lst
@@ -102,8 +103,9 @@ let rec desugar exprS = match exprS with
   | NeqS (x, y) -> desugar (NotS (EqS (x, y)))
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
+  | ConsS (ls1, ls2) -> ConsC (desugar ls1, desugar ls2)
   | LetS (s, e1, e2) -> LetC (s, desugar e1, desugar e2)
-  | FunS (arg, types, body) -> FunC (arg, types, desugar body)
+  | FunS (arg, t, body) -> FunC (arg, t, desugar body)
   | ArgS s -> ArgC s
   | CallS e -> CallC (desugar e)
 
@@ -167,7 +169,7 @@ let rec interp env r = match r with
                       | Some v -> v
                       | None -> raise(Failure "Lookup"))
   | LetC (s, e1, e2) -> interp (bind s (interp env e1) env) e2
-  | FunC (arg, types, body) -> interp (bind arg (interp env body) env) body
+  | FunC (arg, t, body) -> interp (bind arg (interp env body) env) body
 
 let rec tc env e =
     match e with
@@ -205,9 +207,10 @@ let rec tc env e =
                           | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
+    | ConsC (x, lst) -> tc env lst (* we only need to know if ls2 is a list *)
     | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
-    | FunC (arg, types, body) -> if (types = (tc env body)) then types else raise (Failure ("Typecheck"))
-    | _ -> raise (Failure "Topecheck")
+    | FunC (arg, t, body) -> if (t = (tc env body)) then t else raise (Failure ("Typecheck"))
+    | _ -> raise (Failure "Typecheck")
 (*     | EqC (x, y) -> (match (x, y) with
                               | (IntC x, IntC y) -> BoolT
                               | (FloatC x, FloatC y) -> BoolT

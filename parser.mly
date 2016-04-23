@@ -17,12 +17,15 @@
 %token FUN OF TO
 %token <string> ARG
 %token INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
+%token OPENLST CLOSELST CONS
 
 %nonassoc INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
 %nonassoc OPEN CLOSE
 %nonassoc ELSE
 %nonassoc LET BE IN
 %nonassoc FUN OF TO
+%nonassoc CONS
+%nonassoc OPENLST CLOSELST
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
 %nonassoc NOT
@@ -30,7 +33,7 @@
 %left PLUS MINUS PLUSF MINUSF
 %left TIMES DIVIDE TIMESF DIVIDEF
 %token DBLSEMI
-%nonassoc FLOAT INT
+%nonassoc FLOAT INT ARG
 
 %start main
 %type <Types.exprS> main
@@ -59,6 +62,8 @@ expr:
   | VARIABLE                    { VarS $1 }
   | ARG                             { ArgS $1 }
   | OPEN expr CLOSE       { $2 }
+  | OPENLST expr CLOSELST  { ListS [$2] }
+  | expr CONS expr          { ConsS ($1, $3) }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
   | expr AND expr 				       { AndS($1 , $3) }
