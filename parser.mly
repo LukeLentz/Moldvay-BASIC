@@ -14,7 +14,7 @@
 %token EQ NEQ
 %token LET BE IN
 %token OPEN CLOSE
-%token FUN TO
+%token FUN OF TO
 %token <string> ARG
 %token INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
 
@@ -22,6 +22,7 @@
 %nonassoc OPEN CLOSE
 %nonassoc ELSE
 %nonassoc LET BE IN
+%nonassoc FUN OF TO
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
 %nonassoc NOT
@@ -77,5 +78,5 @@ expr:
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
   | LET VARIABLE BE expr IN expr      { LetS ($2, $4, $6) }
-  | FUN ARG OF atype TO exprS         { FunS ($2, $4, $6) }
+  | FUN ARG OF atype TO expr       { FunS ($2, $4, $6) }
 ;
