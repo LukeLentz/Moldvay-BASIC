@@ -50,6 +50,9 @@ rule token = parse
   | "in"  { IN }
   | "("    { OPEN }
   | ")"     { CLOSE }
+  | "fun"  { FUN }
+  | "->"   { TO }
+  | ":"      { TYPE }
   | var as x { VARIABLE x}
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
