@@ -66,6 +66,8 @@ let rec lookup str env = match env with
 (* val bind :  string -> 'a -> 'a env -> 'a env *)
 let bind str v env = (str, v) :: env
 
+let append v lst = v :: lst
+
 (*
    HELPER METHODS
    You may be asked to add methods here. You may also choose to add your own
@@ -197,7 +199,7 @@ let rec tc env e =
                                                else raise (Failure "Typecheck")))
     | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
     | FunC (arg, types, body) -> if (types = (tc env body)) then types else raise (Failure ("Typecheck"))
-    | _ -> raise (Failure "Typecheck")
+    | _ -> raise (Failure "Topecheck")
 (*     | EqC (x, y) -> (match (x, y) with
                               | (IntC x, IntC y) -> BoolT
                               | (FloatC x, FloatC y) -> BoolT
