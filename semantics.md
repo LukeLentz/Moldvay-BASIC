@@ -24,9 +24,11 @@ not : bool -> bool
 if e1 then e2 else e3
 	returns e2 if e1 is true, else it returns e3
 
-def string e1 (e2)*
-	binds e1 to the string, equivalent to let statement
-	(e2)* are additional expressions equivalent to let in
+let s = e1 in e2
+    binds the expr e1 to the string s and then evaluates the expr e2
+
+fun (x : int) -> (x + 2)
+    a function that takes an int x and adds two
 
 Addition:
     arith + int int
