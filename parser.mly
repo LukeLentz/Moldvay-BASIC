@@ -57,6 +57,7 @@ expr:
   | TRUE                         { BoolS true }
   | FALSE                        { BoolS false }
   | VARIABLE                    { VarS $1 }
+  | ARG                             { ArgS $1 }
   | OPEN expr CLOSE       { $2 }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
