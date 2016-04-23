@@ -14,12 +14,11 @@
 %token EQ NEQ
 %token LET BE IN
 %token OPEN CLOSE
-%token FUN TYPE TO
+%token FUN TO
 %token <string> ARG
 
 %nonassoc OPEN CLOSE
 %nonassoc ELSE
-%nonassoc FUN ARG TYPE TO
 %nonassoc LET BE IN
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
@@ -32,6 +31,7 @@
 
 %start main
 %type <Types.exprS> main
+%type <Types.types> atype
 %%
 
 main:
@@ -40,6 +40,14 @@ main:
 
 headEx:
   | expr                         { $1 }
+;
+
+atype:
+  | INTTYPE             { IntT }
+  | FLOATTYPE        { FloatT }
+  | BOOLTYPE           { BoolT }
+  | LISTTYPE            { ListT }
+  | TUPLETYPE           { TupleT }
 ;
 
 expr:
@@ -67,5 +75,5 @@ expr:
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
   | LET VARIABLE BE expr IN expr      { LetS ($2, $4, $6) }
-  | FUN ARG TYPE expr TO expr                       { FunS ($2, $4, $6) }
+  | FUN ARG OF atype TO exprS         { FunS ($2, $4, $6) }
 ;

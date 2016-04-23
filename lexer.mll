@@ -51,8 +51,13 @@ rule token = parse
   | "("    { OPEN }
   | ")"     { CLOSE }
   | "fun"  { FUN }
+  | ":"      { OF }
   | "->"   { TO }
-  | ":"      { TYPE }
+  | "int"    { INTTYPE }
+  | "float" { FLOATTYPE }
+  | "bool"  { BOOLTYPE }
+  | "tuple"  { TUPLETYPE }
+  | "list"         { LISTTYPE }
   | var as x { VARIABLE x}
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
