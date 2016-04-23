@@ -68,6 +68,14 @@ let bind str v env = (str, v) :: env
 
 let append v lst = v :: lst
 
+let is_empty lst = match lst with
+                            | [] -> true
+                            | _ -> false
+                            
+let hd lst = List.hd lst
+
+let tl lst = List.tl lst
+
 (*
    HELPER METHODS
    You may be asked to add methods here. You may also choose to add your own
