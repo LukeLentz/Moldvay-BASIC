@@ -66,6 +66,8 @@ rule token = parse
   | "["             { L_BRACK }
   | "]"             { R_BRACK }
   | "::"          { CONS }
+  | "hd"        { HEAD }
+  | "tl"            { TAIL }
   | arg as x  { ARG x }
   | var as x { VARIABLE x}
   | comp as s   { COMPOP s }

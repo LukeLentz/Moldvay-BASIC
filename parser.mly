@@ -20,7 +20,7 @@
 %token <string> ARG
 %token <string> LIST
 %token INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
-%token L_BRACK R_BRACK CONS
+%token L_BRACK R_BRACK CONS HEAD TAIL
 
 %nonassoc INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
 %nonassoc L_PAREN R_PAREN
@@ -28,6 +28,7 @@
 %nonassoc LET BE IN
 %nonassoc FUN COLON ARROW
 %nonassoc CONS
+%nonassoc HEAD TAIL
 %nonassoc LIST
 %token SEMI
 %token COMMA
@@ -71,7 +72,8 @@ expr:
   | ARG                             { ArgS $1 }
   | L_PAREN expr R_PAREN       { $2 }
   | L_BRACK lists R_BRACK  { ListS $2 }
-  | expr CONS expr          { ConsS ($1, $3) }
+  | HEAD expr            { HeadS $2 }
+  | TAIL expr               { TailS $2 }
   | L_PAREN tuples R_PAREN { TupleS $2 }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }

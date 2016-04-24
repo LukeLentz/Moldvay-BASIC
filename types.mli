@@ -19,6 +19,8 @@ type exprC = IntC of int
                   | EqC of (exprC * exprC)
                   | TupleC of exprC list
                   | ListC of exprC list
+                  | HeadC of exprC
+                  | TailC of exprC
                   | ConsC of (exprC * exprC)
                   | VarC of string
                   | LetC of (string * exprC * exprC)
@@ -41,6 +43,8 @@ type exprS = IntS of int
                   | NeqS of (exprS * exprS)
                   | TupleS of exprS list
                   | ListS of exprS list
+                  | HeadS of exprS
+                  | TailS of exprS
                   | ConsS of (exprS * exprS)
                   | VarS of string
                   | LetS of (string * exprS * exprS)
@@ -54,6 +58,7 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
                   | Var of string
+                  | Any
 
 
 
