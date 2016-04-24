@@ -9,6 +9,6 @@ ocamlc -o moldvay lexer.cmo parser.cmo types.cmo driver.cmo<br />
 ./moldvay
 
 ## Important Files
-[details.md](https://github.com/LukeLentz/Moldvay-BASIC/blob/master/details.md)
-[semantics.md](https://github.com/LukeLentz/Moldvay-BASIC/blob/master/semantics.md)
-[examples.md](https://github.com/LukeLentz/Moldvay-BASIC/blob/master/examples.md)
+[details.md](https://github.com/LukeLentz/Moldvay-BASIC/blob/master/details.md)<br />
+[semantics.md](https://github.com/LukeLentz/Moldvay-BASIC/blob/master/semantics.md)<br />
+[examples.md](https://github.com/LukeLentz/Moldvay-BASIC/blob/master/examples.md)<br />
