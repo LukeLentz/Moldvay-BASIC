@@ -27,7 +27,7 @@ if e1 then e2 else e3
 let s = e1 in e2
     binds the expr e1 to the string s and then evaluates the expr e2
 
-fun (x : int) -> (x + 2)
+fun x -> (x + 2)
     a function that takes an int x and adds two
 
 Addition:
@@ -51,6 +51,14 @@ Tuples:
     to access part of a tuple
         t.0 (1, 2, 3) returns 1
         t.1 returns 2, etc
+
+Lists:
+
+to get the head of a list
+        hd (x :: xs) returns x
+
+to get the tail
+    tl (x :: xs) returns xs
         
 
 
