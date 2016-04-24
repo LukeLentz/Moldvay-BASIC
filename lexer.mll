@@ -13,6 +13,7 @@ let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
 let dblsemi = ";;"
 let semi = ";"
+let comma = ","
 let float = (digit+ '.' | digit* frac) exp?
 let int = (digit)+
 let true = "true" | "#t"
@@ -26,6 +27,7 @@ rule token = parse
   | newline     { token lexbuf }
   | dblsemi     { DBLSEMI }
   | semi          { SEMI }
+  | comma     { COMMA }
   | float as x  { FLOAT (float_of_string x) }
   | int as x    { INT (int_of_string x) }
   | true        { TRUE }

@@ -7,6 +7,7 @@
 %token TRUE FALSE
 %token DBLSEMI
 %token SEMI
+%token COMMA
 %token IF THEN ELSE
 %token OR AND NOT XOR NAND
 %token PLUS MINUS TIMES DIVIDE PLUSF MINUSF TIMESF DIVIDEF
@@ -29,6 +30,7 @@
 %nonassoc CONS
 %nonassoc LIST
 %token SEMI
+%token COMMA
 %nonassoc L_BRACK R_BRACK
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
@@ -70,6 +72,7 @@ expr:
   | L_PAREN expr R_PAREN       { $2 }
   | L_BRACK lists R_BRACK  { ListS $2 }
   | expr CONS expr          { ConsS ($1, $3) }
+  | L_PAREN tuples R_PAREN { TupleS $2 }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
   | expr AND expr 				       { AndS($1 , $3) }
@@ -95,4 +98,10 @@ lists:
     |                   { [] }
     | expr           { [$1] }
     | expr SEMI lists     { $1 :: $3 }
+;
+
+tuples:
+    |               { [] }
+    | expr      { [$1] }
+    | expr COMMA tuples { $1 :: $3 }
 ;
