@@ -25,6 +25,7 @@ rule token = parse
   | white       { token lexbuf }
   | newline     { token lexbuf }
   | dblsemi     { DBLSEMI }
+  | semi          { SEMI }
   | float as x  { FLOAT (float_of_string x) }
   | int as x    { INT (int_of_string x) }
   | true        { TRUE }
@@ -54,7 +55,7 @@ rule token = parse
   | ")"     { R_PAREN }
   | "fun"  { FUN }
   | ":"      { COLON }
-  | "->"   { TO }
+  | "->"   { ARROW }
   | "int"    { INTTYPE }
   | "float" { FLOATTYPE }
   | "bool"  { BOOLTYPE }

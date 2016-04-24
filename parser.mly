@@ -6,6 +6,7 @@
 %token <int> INT
 %token TRUE FALSE
 %token DBLSEMI
+%token SEMI
 %token IF THEN ELSE
 %token OR AND NOT XOR NAND
 %token PLUS MINUS TIMES DIVIDE PLUSF MINUSF TIMESF DIVIDEF
@@ -14,7 +15,7 @@
 %token EQ NEQ
 %token LET BE IN
 %token L_PAREN R_PAREN
-%token FUN COLON TO
+%token FUN COLON ARROW
 %token <string> ARG
 %token <string> LIST
 %token INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
@@ -24,9 +25,10 @@
 %nonassoc L_PAREN R_PAREN
 %nonassoc ELSE
 %nonassoc LET BE IN
-%nonassoc FUN COLON TO
+%nonassoc FUN COLON ARROW
 %nonassoc CONS
 %nonassoc LIST
+%token SEMI
 %nonassoc L_BRACK R_BRACK
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
@@ -56,6 +58,8 @@ atype:
   | BOOLTYPE           { BoolT }
 ;
 
+
+
 expr:
   | FLOAT                        { FloatS $1 }
   | INT                          { IntS $1 }
@@ -64,7 +68,7 @@ expr:
   | VARIABLE                    { VarS $1 }
   | ARG                             { ArgS $1 }
   | L_PAREN expr R_PAREN       { $2 }
-  | L_BRACK expr R_BRACK  { ListS [$2] }
+  | L_BRACK lists R_BRACK  { ListS $2 }
   | expr CONS expr          { ConsS ($1, $3) }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
@@ -84,5 +88,11 @@ expr:
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
   | LET VARIABLE BE expr IN expr      { LetS ($2, $4, $6) }
-  | FUN ARG COLON atype TO expr       { FunS ($2, $4, $6) }
+  | FUN ARG COLON atype ARROW expr       { FunS ($2, $4, $6) }
+;
+
+lists:
+    |                   { [] }
+    | expr           { [$1] }
+    | expr SEMI lists     { $1 :: $3 }
 ;
