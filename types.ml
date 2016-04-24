@@ -165,6 +165,9 @@ let rec interp env r = match r with
   | HeadC lst -> (match (interp env lst) with
                             | List (x :: xs) ->  x
                             | _ -> raise (Failure "Interp"))
+  | TailC lst -> (match  (interp env lst) with
+                        | List (x :: xs) -> List xs
+                        | _ -> raise (Failure "Interp"))
   | VarC v -> (match (lookup v env) with
                       | Some v -> v
                       | None -> raise(Failure "Lookup"))
