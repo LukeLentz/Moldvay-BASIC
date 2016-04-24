@@ -13,19 +13,21 @@
 %token <string> VARIABLE
 %token EQ NEQ
 %token LET BE IN
-%token OPEN CLOSE
-%token FUN OF TO
+%token L_PAREN R_PAREN
+%token FUN COLON TO
 %token <string> ARG
+%token <string> LIST
 %token INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
-%token OPENLST CLOSELST CONS
+%token L_BRACK R_BRACK CONS
 
 %nonassoc INTTYPE FLOATTYPE BOOLTYPE LISTTYPE TUPLETYPE
-%nonassoc OPEN CLOSE
+%nonassoc L_PAREN R_PAREN
 %nonassoc ELSE
 %nonassoc LET BE IN
-%nonassoc FUN OF TO
+%nonassoc FUN COLON TO
 %nonassoc CONS
-%nonassoc OPENLST CLOSELST
+%nonassoc LIST
+%nonassoc L_BRACK R_BRACK
 %left OR AND XOR NAND
 %nonassoc EQ NEQ
 %nonassoc NOT
@@ -61,8 +63,8 @@ expr:
   | FALSE                        { BoolS false }
   | VARIABLE                    { VarS $1 }
   | ARG                             { ArgS $1 }
-  | OPEN expr CLOSE       { $2 }
-  | OPENLST expr CLOSELST  { ListS [$2] }
+  | L_PAREN expr R_PAREN       { $2 }
+  | L_BRACK expr R_BRACK  { ListS [$2] }
   | expr CONS expr          { ConsS ($1, $3) }
   | IF expr THEN expr ELSE expr  { IfS($2,$4,$6) }
   | expr OR expr 				         { OrS($1 , $3) }
@@ -82,5 +84,5 @@ expr:
   | expr EQ expr 				         { EqS ($1, $3) }
   | expr NEQ expr 				       { NeqS ($1, $3) }
   | LET VARIABLE BE expr IN expr      { LetS ($2, $4, $6) }
-  | FUN ARG OF atype TO expr       { FunS ($2, $4, $6) }
+  | FUN ARG COLON atype TO expr       { FunS ($2, $4, $6) }
 ;

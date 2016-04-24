@@ -12,6 +12,7 @@ let exp = ['e' 'E'] sign? digit+
 let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
 let dblsemi = ";;"
+let semi = ";"
 let float = (digit+ '.' | digit* frac) exp?
 let int = (digit)+
 let true = "true" | "#t"
@@ -27,7 +28,7 @@ rule token = parse
   | float as x  { FLOAT (float_of_string x) }
   | int as x    { INT (int_of_string x) }
   | true        { TRUE }
-  | false       { FALSE }
+  | false     { FALSE }
   | "if"        { IF }
   | "then"      { THEN }
   | "else"      { ELSE }
@@ -49,21 +50,19 @@ rule token = parse
   | "let"  { LET }
   | "="  { BE }
   | "in"  { IN }
-  | "("    { OPEN }
-  | ")"     { CLOSE }
+  | "("    { L_PAREN }
+  | ")"     { R_PAREN }
   | "fun"  { FUN }
-  | ":"      { OF }
+  | ":"      { COLON }
   | "->"   { TO }
   | "int"    { INTTYPE }
   | "float" { FLOATTYPE }
   | "bool"  { BOOLTYPE }
   | "tuple"  { TUPLETYPE }
   | "list"         { LISTTYPE }
-  | "["             { OPENLST }
-  | "]"             { CLOSELST }
+  | "["             { L_BRACK }
+  | "]"             { R_BRACK }
   | "::"          { CONS }
-  | "["             { OPENLST }
-  | "]"             { CLOSELST }
   | arg as x  { ARG x }
   | var as x { VARIABLE x}
   | comp as s   { COMPOP s }
