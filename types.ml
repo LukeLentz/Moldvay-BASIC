@@ -19,7 +19,9 @@ type exprC = IntC of int
                   | EqC of (exprC * exprC)
                   | TupleC of exprC list
                   | ListC of exprC list
-                  | ConsC of (exprC* exprC)
+                  | HeadC of exprC
+                  | TailC of exprC
+                  | ConsC of (exprC * exprC)
                   | VarC of string
                   | LetC of (string * exprC * exprC)
                   | FunC of (string * types * exprC)
@@ -41,6 +43,8 @@ type exprS = IntS of int
                   | NeqS of (exprS * exprS)
                   | TupleS of exprS list
                   | ListS of exprS list
+                  | HeadS of exprS
+                  | TailS of exprS
                   | ConsS of (exprS * exprS)
                   | VarS of string
                   | LetS of (string * exprS * exprS)
@@ -54,6 +58,7 @@ type value = Int of int
                   | Tuple of value list
                   | List of value list
                   | Var of string
+                  | Any
 
 type 'a env = (string * 'a) list
 
@@ -66,16 +71,6 @@ let rec lookup str env = match env with
   | (s,v) :: tl -> if s = str then Some v else lookup str tl
 (* val bind :  string -> 'a -> 'a env -> 'a env *)
 let bind str v env = (str, v) :: env
-
-let append v lst = v :: lst
-
-let is_empty lst = match lst with
-                            | [] -> true
-                            | _ -> false
-
-let hd lst = List.hd lst
-
-let tl lst = List.tl lst
 
 (*
    HELPER METHODS
@@ -103,6 +98,8 @@ let rec desugar exprS = match exprS with
   | NeqS (x, y) -> desugar (NotS (EqS (x, y)))
   | TupleS lst -> TupleC (List.map (desugar) lst)
   | ListS lst -> ListC (List.map (desugar) lst)
+  | HeadS lst -> HeadC (desugar lst)
+  | TailS lst -> TailC (desugar lst)
   | ConsS (ls1, ls2) -> ConsC (desugar ls1, desugar ls2)
   | LetS (s, e1, e2) -> LetC (s, desugar e1, desugar e2)
   | FunS (arg, t, body) -> FunC (arg, t, desugar body)
@@ -165,6 +162,9 @@ let rec interp env r = match r with
                                      | _ -> raise (Failure "Not a Bool"))
   | TupleC lst -> Tuple (List.map (interp env) lst)
   | ListC lst -> List (List.map (interp env) lst)
+  | HeadC lst -> (match (interp env lst) with
+                            | List (x :: xs) ->  x
+                            | _ -> raise (Failure "Interp"))
   | VarC v -> (match (lookup v env) with
                       | Some v -> v
                       | None -> raise(Failure "Lookup"))
@@ -207,6 +207,8 @@ let rec tc env e =
                           | (x :: xs) -> (if (List.for_all (fun a -> ((tc env a) = (tc env x))) lst)
                                                then ListT (List.map (tc env) lst)
                                                else raise (Failure "Typecheck")))
+    | HeadC lst -> tc env lst
+    | TailC lst -> tc env lst
     | ConsC (x, lst) -> tc env lst (* we only need to know if ls2 is a list *)
     | LetC (s, e1, e2) -> tc (bind s (tc env e1) env) e2
     | FunC (arg, t, body) -> if (t = (tc env body)) then t else raise (Failure ("Typecheck"))
@@ -283,6 +285,7 @@ let rec valToString r = match r with
   | Tuple lst ->  (String.concat " * " ((List.map (valToString) lst)))
   | List lst -> (String.concat " * " ((List.map (valToString) lst)))
   | Var s -> s
+  | Any -> ""
 
 let rec typeToString t = 
     match t with
